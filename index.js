@@ -186,8 +186,8 @@ client.on("guildMemberAdd", async (member) => {
   }
 });
 
-const bumpChannelId = "1228039676279918713"; // Replace with your actual channel ID
-const bumpId = "1351749413122474015"; // Replace with your actual role ID
+const bumpChannelId = "1228039676279918713";
+const bumpId = "1351749413122474015";
 
 client.once("ready", () => {
   console.log("Bot is ready!");
@@ -310,10 +310,11 @@ client.on("messageCreate", async (message) => {
   }
 });
 
-// Check if the message contains the word "chocolate" (case-insensitive)
 if (message.content.toLowerCase().includes(mj)) {
-  // React to the message with a chocolate emoji
-  message.reply("yes yes luca weve heard it a 1000 times");
+  message.react("🕺");
+  await message.channel.send({
+    content: message.reply("yes yes luca weve heard it a 1000 times"),
+  });
 }
 
 if (
