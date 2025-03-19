@@ -11,6 +11,8 @@ import {
   Routes,
 } from "discord.js";
 
+import db from "./db.js";
+
 import { rules } from "./rules.js";
 import { bibleVersus } from "./arrays/bibleverse.js";
 import { pickUpLines } from "./arrays/pickuplines.js";
