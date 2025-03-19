@@ -388,26 +388,39 @@ client.on("messageCreate", async (message) => {
   }
 
   // Check if the message starts with !getmessages and if the user is an admin
-  if (message.content.toLowerCase().startsWith("!getmessages")) {
-    if (message.member.permissions.has("ADMINISTRATOR")) {
-      // Get the channel ID where the command was used
-      const channelId = message.channel.id;
+  if (
+    message.content.startsWith("!getmessages") &&
+    message.member.permissions.has("ADMINISTRATOR")
+  ) {
+    const args = message.content.split(" ");
+    const numberOfMessages = args[1] ? parseInt(args[1], 10) : 100; // Default to 100 if no number is specified
 
-      try {
-        const messages = await getMessages(channelId, 200);
-        message.reply(
-          `Here are the messages in the channel:\n\`\`\`json\n${JSON.stringify(
-            messages,
-            null,
-            2
-          )}\n\`\`\``
-        );
-      } catch (error) {
-        message.reply("An error occurred while fetching the messages.");
-        console.error(error);
-      }
-    } else {
-      message.reply("You do not have permission to use this command.");
+    // Fetch messages from the channel
+    try {
+      const messages = await message.channel.messages.fetch({
+        limit: numberOfMessages,
+      });
+
+      // Prepare data for training (user info, message content, etc.)
+      const messageData = messages.map((msg) => ({
+        messageId: msg.id,
+        content: msg.content,
+        authorId: msg.author.id,
+        authorUsername: msg.author.username,
+        authorDiscriminator: msg.author.discriminator,
+        timestamp: msg.createdTimestamp,
+      }));
+
+      // Log the data or send it to a database
+      console.log(JSON.stringify(messageData, null, 2));
+
+      // Optionally, send the data back in the channel (be mindful of limits)
+      message.channel.send(
+        "yo yo yo I have fetched the messages! Check the logs."
+      );
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      message.reply("There was an error trying to fetch the messages!");
     }
   }
 });
