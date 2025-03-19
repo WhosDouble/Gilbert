@@ -13,6 +13,8 @@ import {
 
 import OpenAI from "openai";
 
+import https from "https";
+
 import db from "./db.js";
 
 import { rules } from "./rules.js";
@@ -160,6 +162,10 @@ const commands = [
   {
     name: "rules",
     description: "Flowing Faith server rules",
+  },
+  {
+    name: "get_channel_messages",
+    description: "gets that channels messages and converts it into json",
   },
 ];
 
@@ -380,7 +386,90 @@ client.on("messageCreate", async (message) => {
       content: "It's ok humans make mistakes, but Gilbert doesn't 😐",
     });
   }
+
+  // Check if the message starts with !getmessages and if the user is an admin
+  if (message.content.toLowerCase().startsWith("!getmessages")) {
+    if (message.member.permissions.has("ADMINISTRATOR")) {
+      // Get the channel ID where the command was used
+      const channelId = message.channel.id;
+
+      try {
+        const messages = await getMessages(channelId, 200);
+        message.reply(
+          `Here are the messages in the channel:\n\`\`\`json\n${JSON.stringify(
+            messages,
+            null,
+            2
+          )}\n\`\`\``
+        );
+      } catch (error) {
+        message.reply("An error occurred while fetching the messages.");
+        console.error(error);
+      }
+    } else {
+      message.reply("You do not have permission to use this command.");
+    }
+  }
 });
+
+async function getMessages(channelId, numMessages) {
+  let allMessages = [];
+  let lastMessageId = null;
+
+  // Loop to fetch messages until we have the required number
+  while (allMessages.length < numMessages) {
+    const response = await makeRequest(channelId, lastMessageId);
+    const messages = JSON.parse(response);
+
+    allMessages = [...allMessages, ...messages];
+
+    // If fewer than 100 messages are returned, stop fetching
+    if (messages.length < 100) break;
+
+    // Update the lastMessageId to fetch the next batch
+    lastMessageId = messages[messages.length - 1].id;
+  }
+
+  // Return only the number of messages requested
+  return allMessages.slice(0, numMessages);
+}
+
+function makeRequest(channelId, lastMessageId = null) {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: "discord.com",
+      path: `/api/v10/channels/${channelId}/messages?limit=100${
+        lastMessageId ? `&before=${lastMessageId}` : ""
+      }`,
+      method: "GET",
+      headers: {
+        Authorization: `Bot ${DISCORD_TOKEN}`,
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      let data = "";
+
+      res.on("data", (chunk) => {
+        data += chunk;
+      });
+
+      res.on("end", () => {
+        if (res.statusCode === 200) {
+          resolve(data);
+        } else {
+          reject(`Error: ${res.statusCode} - ${data}`);
+        }
+      });
+    });
+
+    req.on("error", (error) => {
+      reject(error);
+    });
+
+    req.end();
+  });
+}
 
 client.on("interactionCreate", async (interaction) => {
   // Ensure the interaction is a button press
@@ -407,7 +496,7 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.commandName === "help") {
       await interaction.reply({
         content:
-          "Here are the available commands\n- `/help` - Lists all available commands\n- `/random_pickup_line` - Sends a random Christian friendly pickup line\n- `/random_joke` - Sends a random joke\n- `/rules` - The Flowing Faith rules",
+          "Here are the available commands\n- `/help` - Lists all available commands\n- `/random_pickup_line` - Sends a random Christian friendly pickup line\n- `/random_joke` - Sends a random joke\n- `/rules` - The Flowing Faith rules\n- `!getmessages` - only for people with admin permissions fetches messages on the channel you put the command in and converts it into json",
         ephemeral: true,
       });
     }
