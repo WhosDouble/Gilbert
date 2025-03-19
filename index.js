@@ -130,6 +130,37 @@ const thanks = [
   "thank ou",
 ];
 
+const brainRot = [
+  "GYAT",
+  "Skill Issue",
+  "Cope",
+  "Rizz",
+  "Slay",
+  "Pookie",
+  "skibidi",
+  "sigma",
+  "alpha",
+  "fanum tax",
+  "delulu",
+  "ohio",
+  "duke dennis",
+  "duke",
+  "baby gronk",
+  "gronk",
+  "sussy",
+  "baka",
+  "imposter",
+  "sussy imposter",
+  "goon",
+  "gooner",
+  "turbulence",
+  "griddy",
+  "gyatt",
+  "gyyyaat",
+  "ratio",
+  "among us",
+];
+
 const denada = ["of course", "no worries", "no problem", "no problema"];
 const randomDenada = denada[Math.floor(Math.random() * denada.length)];
 
@@ -294,10 +325,6 @@ function sendVotd() {
 // the bot picking up on messages sent and responding accordingly
 client.on("messageCreate", async (message) => {
   const member = await message.guild.members.fetch(message.author.id);
-  console.log(
-    "Current number of messageCreate listeners:",
-    client.listeners("messageCreate").length
-  );
   console.log(message.content);
   console.log("message received");
 
@@ -405,10 +432,7 @@ client.on("messageCreate", async (message) => {
         const messageData = messages.map((msg) => ({
           messageId: msg.id,
           content: msg.content,
-          authorId: msg.author.id,
           authorUsername: msg.author.username,
-          authorDiscriminator: msg.author.discriminator,
-          timestamp: msg.createdTimestamp,
         }));
 
         console.log(JSON.stringify(messageData, null, 2));
@@ -565,7 +589,7 @@ client.on("messageCreate", async (message) => {
           },
           { role: "user", content: message.content },
         ],
-        max_tokens: 100,
+        max_tokens: 250,
       });
 
       message.reply(response.choices[0].message.content);
