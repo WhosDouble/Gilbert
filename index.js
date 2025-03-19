@@ -53,7 +53,7 @@ async function getJoke() {
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const countFilePath = path.join(__dirname, "choclateCount.json");
 
-let choclateCount = 0;
+let chocolateCount = 0;
 
 if (fs.existsSync(countFilePath)) {
   const data = fs.readFileSync(countFilePath, "utf8");
