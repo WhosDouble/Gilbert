@@ -8,15 +8,15 @@ dotenv.config(); // Load environment variables from .env file
 
 // Create a new client instance
 const db = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false, // For Railway to work
-  },
+  host: process.env.PGHOST,
+  port: process.env.PGPORT,
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+  database: process.env.PGDATABASE,
 });
 
-// Connect to the database
 db.connect()
-  .then(() => console.log("Connected to the PostgreSQL database!"))
-  .catch((err) => console.error("Error connecting to the database:", err));
+  .then(() => console.log("✅ Connected to PostgreSQL database"))
+  .catch((err) => console.error("❌ Database connection error:", err));
 
 export default db;

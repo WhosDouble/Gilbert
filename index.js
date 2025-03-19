@@ -11,6 +11,8 @@ import {
   Routes,
 } from "discord.js";
 
+import OpenAI from "openai";
+
 import db from "./db.js";
 
 import { rules } from "./rules.js";
@@ -123,6 +125,9 @@ const thanks = [
   "thank uou",
   "thank ou",
 ];
+
+const denada = ["of course", "no worries", "no problem", "no problema"];
+const randomDenada = denada[Math.floor(Math.random() * denada.length)];
 
 const tellBtn = new ButtonBuilder()
   .setLabel("Tell me about yourself") // Button text
@@ -348,8 +353,7 @@ client.on("messageCreate", async (message) => {
     )
   ) {
     await message.channel.send({
-      content: `No problema😉 Thank you ${member.displayName} For thanking me 😎`,
-      ephemeral: false,
+      content: `${randomDenada} 😉 Thank you ${member.displayName} For thanking me 😎`,
     });
   }
 
@@ -427,6 +431,37 @@ client.on("interactionCreate", async (interaction) => {
         content: rules,
         ephemeral: true,
       });
+    }
+  }
+});
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// Handle AI responses in messageCreate event
+client.on("messageCreate", async (message) => {
+  if (message.author.bot) return;
+
+  if (message.content.toLowerCase().startsWith("gilbert")) {
+    try {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a fun, wholesome and friendly Discord bot named Gilbert.",
+          },
+          { role: "user", content: message.content },
+        ],
+        max_tokens: 100,
+      });
+
+      message.reply(response.choices[0].message.content);
+    } catch (error) {
+      console.error("Error generating AI response:", error);
+      message.reply("Oops! My brain is fried. Try again later.");
     }
   }
 });
