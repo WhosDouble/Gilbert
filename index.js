@@ -216,7 +216,6 @@ client.on("messageCreate", async (message) => {
   // Ignore messages from bots
   if (message.author.bot) return;
 
-  // Ensure no multiple responses by making checks exclusive
   if (
     greeting.some(
       (greet) =>
