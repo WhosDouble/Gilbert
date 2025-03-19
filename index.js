@@ -161,12 +161,25 @@ const bumpChannelId = "1228039676279918713"; // Replace with your actual channel
 const bumpId = "1351749413122474015"; // Replace with your actual role ID
 
 client.once("ready", () => {
-  // Wait 2 hours before the first message, then repeat every 2 hours
-  setTimeout(() => {
-    sendBumpReminder(); // First reminder after 2 hours
-    setInterval(sendBumpReminder, 2 * 60 * 60 * 1000); // Repeat every 2 hours
-  }, 2 * 60 * 60 * 1000);
+  console.log("Bot is ready!");
+  scheduleBumpReminder();
 });
+
+function scheduleBumpReminder() {
+  const now = new Date();
+  const nextWholeHour = new Date();
+
+  nextWholeHour.setMinutes(0, 0, 0); // Reset to the exact hour
+  nextWholeHour.setHours(now.getHours() + 1); // Move to the next whole hour
+
+  const timeUntilNextHour = nextWholeHour - now;
+  console.log(`Next bump reminder scheduled for: ${nextWholeHour}`);
+
+  setTimeout(() => {
+    sendBumpReminder();
+    setInterval(sendBumpReminder, 2 * 60 * 60 * 1000); // Repeat every 2 hours
+  }, timeUntilNextHour);
+}
 
 function sendBumpReminder() {
   const channel = client.channels.cache.get(bumpChannelId);
@@ -174,6 +187,7 @@ function sendBumpReminder() {
     channel.send(
       `⏰ <@&${bumpId}> ⏰ yo yo yo 🗣 it's been two hours bros, time to get bumpin 🤜`
     );
+    console.log("Bump reminder sent!");
   } else {
     console.error("Bump channel not found!");
   }
@@ -182,24 +196,39 @@ function sendBumpReminder() {
 const dailyVerseChannelId = "1227297701318889542";
 const votdId = "1228395980898963516";
 
-const randomVerseIndex = Math.floor(Math.random() * bibleVersus.length);
-const randomVerse = bibleVersus[randomVerseIndex];
-
 client.once("ready", () => {
-  // Wait 2 hours before the first message, then repeat every 2 hours
-  setTimeout(() => {
-    sendVotd(); // First reminder after 2 hours
-    setInterval(sendVotd, 18 * 60 * 60 * 1000); // Repeat every 2 hours
-  }, 18 * 60 * 60 * 1000);
+  scheduleDailyMessage();
 });
+
+function scheduleDailyMessage() {
+  const now = new Date();
+  const next9AM = new Date();
+
+  next9AM.setHours(9, 0, 0, 0); // Set time to 9:00:00 AM
+
+  // If it's already past 9 AM today, schedule for tomorrow
+  if (now >= next9AM) {
+    next9AM.setDate(next9AM.getDate() + 1);
+  }
+
+  const timeUntilNext9AM = next9AM - now;
+  console.log(`Next message scheduled for: ${next9AM}`);
+
+  setTimeout(() => {
+    sendVotd();
+    setInterval(sendVotd, 24 * 60 * 60 * 1000); // Repeat every 24 hours
+  }, timeUntilNext9AM);
+}
 
 function sendVotd() {
   const channel = client.channels.cache.get(dailyVerseChannelId);
+  const randomVerse = verses[Math.floor(Math.random() * verses.length)]; // Pick a random verse
 
   if (channel) {
     channel.send(`<@&${votdId}> ${randomVerse}`);
+    console.log(`VOTD sent!`);
   } else {
-    console.error("VOTD channel not found uh oh");
+    console.error("VOTD channel not found.");
   }
 }
 
