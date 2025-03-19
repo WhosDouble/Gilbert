@@ -203,7 +203,7 @@ const channels = [
 
 client.on("guildMemberAdd", async (member) => {
   try {
-    const welcomeChannel = await client.channels.fetch(channels[0].id);
+    const welcomeChannel = "1227288321152122972";
     const member = await message.guild.members.fetch(message.author.id);
 
     if (welcomeChannel) {
@@ -388,101 +388,77 @@ client.on("messageCreate", async (message) => {
   }
 
   // Check if the message starts with !getmessages and if the user is an admin
-  if (
-    message.content.startsWith("!getmessages") &&
-    message.member.permissions.has("ADMINISTRATOR")
-  ) {
-    const args = message.content.split(" ");
-    const numberOfMessages = args[1] ? parseInt(args[1], 10) : 100; // Default to 100 if no number is specified
+  async function getMessages(channelId, numMessages) {
+    let allMessages = [];
+    let lastMessageId = null;
 
-    // Fetch messages from the channel
-    try {
-      const messages = await message.channel.messages.fetch({
-        limit: numberOfMessages,
+    if (
+      message.content.startsWith("!getmessages") &&
+      message.member.permissions.has("ADMINISTRATOR")
+    ) {
+      const args = message.content.split(" ");
+      const numberOfMessages = args[1] ? parseInt(args[1], 10) : 100; // Default to 100 if no number is specified
+
+      // Fetch messages from the channel
+      while (allMessages.length < numMessages) {
+        // Limit the batch to 100 messages per fetch
+        const remainingMessages = numMessages - allMessages.length;
+        const fetchLimit = remainingMessages < 100 ? remainingMessages : 100;
+        
+        const response = await makeRequest(channelId, lastMessageId, fetchLimit);
+        const messages = JSON.parse(response);
+    
+        allMessages = [...allMessages, ...messages];
+    
+        // If fewer messages are returned than requested, stop fetching
+        if (messages.length < fetchLimit) break;
+    
+        // Update the lastMessageId to fetch the next batch
+        lastMessageId = messages[messages.length - 1].id;
+      }
+    
+      // Return only the number of messages requested
+      return allMessages.slice(0, numMessages);
+    }
+    
+    function makeRequest(channelId, lastMessageId = null, limit = 100) {
+      return new Promise((resolve, reject) => {
+        const options = {
+          hostname: "discord.com",
+          path: `/api/v10/channels/${channelId}/messages?limit=${limit}${
+            lastMessageId ? `&before=${lastMessageId}` : ""
+          }`,
+          method: "GET",
+          headers: {
+            Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
+          },
+        };
+    
+        const req = https.request(options, (res) => {
+          let data = "";
+    
+          res.on("data", (chunk) => {
+            data += chunk;
+          });
+    
+          res.on("end", () => {
+            if (res.statusCode === 200) {
+              resolve(data);
+            } else {
+              reject(`Error: ${res.statusCode} - ${data}`);
+            }
+          });
+        });
+    
+        req.on("error", (error) => {
+          reject(error);
+        });
+    
+        req.end();
       });
-
-      // Prepare data for training (user info, message content, etc.)
-      const messageData = messages.map((msg) => ({
-        messageId: msg.id,
-        content: msg.content,
-        authorId: msg.author.id,
-        authorUsername: msg.author.username,
-        authorDiscriminator: msg.author.discriminator,
-        timestamp: msg.createdTimestamp,
-      }));
-
-      // Log the data or send it to a database
-      console.log(JSON.stringify(messageData, null, 2));
-
-      // Optionally, send the data back in the channel (be mindful of limits)
-      message.channel.send(
-        "yo yo yo I have fetched the messages! Check the logs."
-      );
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-      message.reply("There was an error trying to fetch the messages!");
     }
   }
-});
 
-async function getMessages(channelId, numMessages) {
-  let allMessages = [];
-  let lastMessageId = null;
-
-  // Loop to fetch messages until we have the required number
-  while (allMessages.length < numMessages) {
-    const response = await makeRequest(channelId, lastMessageId);
-    const messages = JSON.parse(response);
-
-    allMessages = [...allMessages, ...messages];
-
-    // If fewer than 100 messages are returned, stop fetching
-    if (messages.length < 100) break;
-
-    // Update the lastMessageId to fetch the next batch
-    lastMessageId = messages[messages.length - 1].id;
-  }
-
-  // Return only the number of messages requested
-  return allMessages.slice(0, numMessages);
-}
-
-function makeRequest(channelId, lastMessageId = null) {
-  return new Promise((resolve, reject) => {
-    const options = {
-      hostname: "discord.com",
-      path: `/api/v10/channels/${channelId}/messages?limit=100${
-        lastMessageId ? `&before=${lastMessageId}` : ""
-      }`,
-      method: "GET",
-      headers: {
-        Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
-      },
-    };
-
-    const req = https.request(options, (res) => {
-      let data = "";
-
-      res.on("data", (chunk) => {
-        data += chunk;
-      });
-
-      res.on("end", () => {
-        if (res.statusCode === 200) {
-          resolve(data);
-        } else {
-          reject(`Error: ${res.statusCode} - ${data}`);
-        }
-      });
-    });
-
-    req.on("error", (error) => {
-      reject(error);
-    });
-
-    req.end();
-  });
-}
 
 client.on("interactionCreate", async (interaction) => {
   // Ensure the interaction is a button press
