@@ -328,13 +328,6 @@ client.on("messageCreate", async (message) => {
   }
 });
 
-if (message.content.toLowerCase().includes("its ok gilbert")) {
-  message.react("😅");
-  await message.channel.send({
-    content: "thanks I appreciate that im feeling better already",
-  });
-}
-
 // Check for mentions of Michael Jackson
 if (message.content.toLowerCase().includes(mj)) {
   message.react("🕺");
