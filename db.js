@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config(); // Load environment variables from .env file
 
-const { Client } = pkg;
+const Client = pkg;
 
 const db = new Client({
   connectionString: process.env.DATABASE_URL,
