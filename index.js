@@ -360,9 +360,8 @@ client.on("messageCreate", async (message) => {
   }
 
   if (lol.some((lol) => message.content.toLowerCase().includes(lol))) {
-    await message.channel.send({
-      content: `${randomDenada} 😉 Thank you ${member.displayName} For thanking me 😎`,
-    });
+    message.reply("lol");
+    message.react(randomEmoji);
   }
 
   // Handle "sad" messages
