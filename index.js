@@ -404,23 +404,27 @@ client.on("messageCreate", async (message) => {
         // Limit the batch to 100 messages per fetch
         const remainingMessages = numMessages - allMessages.length;
         const fetchLimit = remainingMessages < 100 ? remainingMessages : 100;
-        
-        const response = await makeRequest(channelId, lastMessageId, fetchLimit);
+
+        const response = await makeRequest(
+          channelId,
+          lastMessageId,
+          fetchLimit
+        );
         const messages = JSON.parse(response);
-    
+
         allMessages = [...allMessages, ...messages];
-    
+
         // If fewer messages are returned than requested, stop fetching
         if (messages.length < fetchLimit) break;
-    
+
         // Update the lastMessageId to fetch the next batch
         lastMessageId = messages[messages.length - 1].id;
       }
-    
+
       // Return only the number of messages requested
       return allMessages.slice(0, numMessages);
     }
-    
+
     function makeRequest(channelId, lastMessageId = null, limit = 100) {
       return new Promise((resolve, reject) => {
         const options = {
@@ -433,14 +437,14 @@ client.on("messageCreate", async (message) => {
             Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
           },
         };
-    
+
         const req = https.request(options, (res) => {
           let data = "";
-    
+
           res.on("data", (chunk) => {
             data += chunk;
           });
-    
+
           res.on("end", () => {
             if (res.statusCode === 200) {
               resolve(data);
@@ -449,108 +453,108 @@ client.on("messageCreate", async (message) => {
             }
           });
         });
-    
+
         req.on("error", (error) => {
           reject(error);
         });
-    
+
         req.end();
       });
     }
   }
 
-
-client.on("interactionCreate", async (interaction) => {
-  // Ensure the interaction is a button press
-  if (interaction.customId === "AboutGilbert") {
-    await interaction.reply({
-      content:
-        "My name is Gilbert! My favorite food is a classic burrito and I'm a Discord bot created by a very swag dude named Rango(aka Double). I was created on 3/18/2025 around 3:30pm. Pretty cool, right? 😎",
-      ephemeral: true, // visible to everyone, set to true for user-only visibility
-    });
-  }
-
-  if (interaction.customId === "AnythingNew") {
-    await interaction.reply({
-      content:
-        "now i have a new command Rango has adujusted my personality and plans on training my brain soon. try asking me something make sure the sentence starts with my name! Rango will soon make it where you can select what type of joke I will tell. Rango has alot of plans to add more wacky interactions! Try `/help` to see what I can do now.",
-      ephemeral: true,
-    });
-  }
-});
-
-//handling slash commands
-client.on("interactionCreate", async (interaction) => {
-  if (interaction.isCommand()) {
-    if (interaction.commandName === "help") {
+  client.on("interactionCreate", async (interaction) => {
+    // Ensure the interaction is a button press
+    if (interaction.customId === "AboutGilbert") {
       await interaction.reply({
         content:
-          "Here are the available commands\n- `/help` - Lists all available commands\n- `/random_pickup_line` - Sends a random Christian friendly pickup line\n- `/random_joke` - Sends a random joke\n- `/rules` - The Flowing Faith rules\n- `!getmessages` - only for people with admin permissions fetches messages on the channel you put the command in and converts it into json",
+          "My name is Gilbert! My favorite food is a classic burrito and I'm a Discord bot created by a very swag dude named Rango(aka Double). I was created on 3/18/2025 around 3:30pm. Pretty cool, right? 😎",
+        ephemeral: true, // visible to everyone, set to true for user-only visibility
+      });
+    }
+
+    if (interaction.customId === "AnythingNew") {
+      await interaction.reply({
+        content:
+          "now i have a new command Rango has adujusted my personality and plans on training my brain soon. try asking me something make sure the sentence starts with my name! Rango will soon make it where you can select what type of joke I will tell. Rango has alot of plans to add more wacky interactions! Try `/help` to see what I can do now.",
         ephemeral: true,
       });
     }
-    if (interaction.commandName === "random_pickup_line") {
-      const randomPickUpLineIndex = Math.floor(
-        Math.random() * pickUpLines.length
-      );
+  });
 
-      const randomPickUpLine = pickUpLines[randomPickUpLineIndex];
-
-      await interaction.reply({
-        content: randomPickUpLine,
-        ephemeral: false,
-      });
-    }
-    if (interaction.commandName === "random_joke") {
-      try {
-        const data = await getJoke();
+  //handling slash commands
+  client.on("interactionCreate", async (interaction) => {
+    if (interaction.isCommand()) {
+      if (interaction.commandName === "help") {
         await interaction.reply({
-          content: `heres a ${data.category} joke for ya, ${data.joke} HAHAHAHAHAHAHA`,
+          content:
+            "Here are the available commands\n- `/help` - Lists all available commands\n- `/random_pickup_line` - Sends a random Christian friendly pickup line\n- `/random_joke` - Sends a random joke\n- `/rules` - The Flowing Faith rules\n- `!getmessages` - only for people with admin permissions fetches messages on the channel you put the command in and converts it into json",
+          ephemeral: true,
         });
-      } catch (error) {
-        content: "Woah seems like i cant think straight try asking for a joke again or just ask later";
+      }
+      if (interaction.commandName === "random_pickup_line") {
+        const randomPickUpLineIndex = Math.floor(
+          Math.random() * pickUpLines.length
+        );
+
+        const randomPickUpLine = pickUpLines[randomPickUpLineIndex];
+
+        await interaction.reply({
+          content: randomPickUpLine,
+          ephemeral: false,
+        });
+      }
+      if (interaction.commandName === "random_joke") {
+        try {
+          const data = await getJoke();
+          await interaction.reply({
+            content: `heres a ${data.category} joke for ya, ${data.joke} HAHAHAHAHAHAHA`,
+          });
+        } catch (error) {
+          content: "Woah seems like i cant think straight try asking for a joke again or just ask later";
+        }
+      }
+      if (interaction.commandName === "rules") {
+        await interaction.reply({
+          content: rules,
+          ephemeral: true,
+        });
       }
     }
-    if (interaction.commandName === "rules") {
-      await interaction.reply({
-        content: rules,
-        ephemeral: true,
-      });
+  });
+
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+
+  // Handle AI responses in messageCreate event
+  client.on("messageCreate", async (message) => {
+    if (message.author.bot) return;
+
+    if (message.content.toLowerCase().startsWith("gilbert")) {
+      try {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are Gilbert, A Christian, wholesome, and informal Discord bot. You love making people smile with friendly jokes, you speak with emojis some what often and have casual conversation, and positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and youre always chill and supportive. And is secretly a chinese spy and gets nervous when asked anything about that topic.",
+            },
+            { role: "user", content: message.content },
+          ],
+          max_tokens: 100,
+        });
+
+        message.reply(response.choices[0].message.content);
+      } catch (error) {
+        console.error("Error generating AI response:", error);
+        message.reply(
+          "Oops! My brain is feels funny. Try asking again later please 😊"
+        );
+      }
     }
-  }
-});
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-// Handle AI responses in messageCreate event
-client.on("messageCreate", async (message) => {
-  if (message.author.bot) return;
-
-  if (message.content.toLowerCase().startsWith("gilbert")) {
-    try {
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are Gilbert, A Christian, wholesome, and informal Discord bot. You love making people smile with friendly jokes, you speak with emojis some what often and have casual conversation, and positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and youre always chill and supportive. And is secretly a chinese spy and gets nervous when asked anything about that topic.",
-          },
-          { role: "user", content: message.content },
-        ],
-        max_tokens: 100,
-      });
-
-      message.reply(response.choices[0].message.content);
-    } catch (error) {
-      console.error("Error generating AI response:", error);
-      message.reply(
-        "Oops! My brain is feels funny. Try asking again later please 😊"
-      );
-    }
-  }
+  });
 });
 
 client.once("ready", () => {
