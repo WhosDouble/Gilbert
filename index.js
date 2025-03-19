@@ -84,6 +84,8 @@ const emojis = [
 
 const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
 
+const lol = ["lol", "ha", "hahaha", "haha", "lmao", "lmafo"];
+
 const mj = [
   "micheal jackson",
   "mj",
@@ -322,7 +324,7 @@ client.on("messageCreate", async (message) => {
   }
 
   // Check for mentions of Michael Jackson
-  if (mj.some((name) => message.content.toLowerCase().includes(name))) {
+  if (mj.some((name) => message.content.toLowerCase().includes(mj))) {
     message.react("🕺");
     await message.channel.send({
       content: "yes yes Luca we've heard it a 1000 times",
@@ -352,6 +354,12 @@ client.on("messageCreate", async (message) => {
         message.content.toLowerCase().endsWith("gilbert")
     )
   ) {
+    await message.channel.send({
+      content: `${randomDenada} 😉 Thank you ${member.displayName} For thanking me 😎`,
+    });
+  }
+
+  if (lol.some((lol) => message.content.toLowerCase().includes(lol))) {
     await message.channel.send({
       content: `${randomDenada} 😉 Thank you ${member.displayName} For thanking me 😎`,
     });
