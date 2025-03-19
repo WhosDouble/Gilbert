@@ -324,7 +324,7 @@ client.on("messageCreate", async (message) => {
   }
 
   // Check for mentions of Michael Jackson
-  if (mj.some((name) => message.content.toLowerCase().includes(mj))) {
+  if (message.content.toLowerCase().includes(mj)) {
     message.react("🕺");
     await message.channel.send({
       content: "yes yes Luca we've heard it a 1000 times",
@@ -359,7 +359,7 @@ client.on("messageCreate", async (message) => {
     });
   }
 
-  if (lol.some((lol) => message.content.toLowerCase().includes(lol))) {
+  if (message.content.toLowerCase().includes(lol)) {
     message.reply("lol");
     message.react(randomEmoji);
   }
@@ -407,7 +407,7 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.commandName === "help") {
       await interaction.reply({
         content:
-          "Here are the available commands\n- /help: Lists all available commands\n- /random_pickup_line: Sends a random Christian friendly pickup line\n- /random_joke: Sends a random joke\n- /rules: The Flowing Faith rules",
+          "Here are the available commands\n- `/help` - Lists all available commands\n- `/random_pickup_line` - Sends a random Christian friendly pickup line\n- `/random_joke` - Sends a random joke\n- `/rules` - The Flowing Faith rules",
         ephemeral: true,
       });
     }
@@ -458,7 +458,7 @@ client.on("messageCreate", async (message) => {
           {
             role: "system",
             content:
-              "You are a fun, wholesome and friendly Discord bot named Gilbert.",
+              "You are Gilbert, A wholesome, and informal Discord bot. You love making people smile with friendly jokes, you speak with emojis some what often and have casual conversation, and positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and youre always chill and supportive.",
           },
           { role: "user", content: message.content },
         ],
