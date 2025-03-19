@@ -388,7 +388,7 @@ client.on("interactionCreate", async (interaction) => {
   if (interaction.customId === "AnythingNew") {
     await interaction.reply({
       content:
-        "Now i give out 2 hour reminders in the #bump channel and should give out daily versus Rango will soon make it where you can select what type of joke I will tell. Rango has alot of plans to add more wacky interactions! Try `/help` to see what I can do now.",
+        "I now can feel emotions rango has isntalled intellegence in my brain try asking me something make sure the sentence starts with my name! Rango will soon make it where you can select what type of joke I will tell. Rango has alot of plans to add more wacky interactions! Try `/help` to see what I can do now.",
       ephemeral: true,
     });
   }
@@ -461,7 +461,9 @@ client.on("messageCreate", async (message) => {
       message.reply(response.choices[0].message.content);
     } catch (error) {
       console.error("Error generating AI response:", error);
-      message.reply("Oops! My brain is fried. Try again later.");
+      message.reply(
+        "Oops! My brain is feels funny. Try asking again later please 😊"
+      );
     }
   }
 });
