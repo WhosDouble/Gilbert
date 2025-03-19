@@ -218,19 +218,6 @@ async function registerCommands() {
     console.error(error);
   }
 }
-//channels to send messages to / get permissions from
-const channels = [
-  {
-    name: "welcome",
-    id: "98823723625922321",
-    guildId: "1227288120584704121",
-    nsfw: false,
-    topic: "Welcome to the server!",
-    position: 0,
-    parrentID: "",
-    lastMessageId: "",
-  },
-];
 
 client.on("guildMemberAdd", async (member) => {
   try {
@@ -275,7 +262,7 @@ function sendBumpReminder() {
   const channel = client.channels.cache.get(bumpChannelId);
   if (channel) {
     channel.send(
-      `⏰ <@&${bumpId}> ⏰ yo yo yo 🗣 it's been two hours bros, time to get bumpin 🤜`
+      `⏰ <@&${bumpId}> ⏰\n- ### yo yo yo 🗣 it's been two hours bros, time to get bumpin 🤜`
     );
     console.log("Bump reminder sent!");
   } else {
@@ -292,27 +279,27 @@ client.once("ready", () => {
 
 function scheduleDailyMessage() {
   const now = new Date();
-  const next9AM = new Date();
+  const next5PM = new Date();
 
-  next9AM.setHours(9, 0, 0, 0); // Set time to 9:00:00 AM
+  next5PM.setHours(17, 0, 0, 0); // Set time to 9:00:00 AM
 
   // If it's already past 9 AM today, schedule for tomorrow
-  if (now >= next9AM) {
-    next9AM.setDate(next9AM.getDate() + 1);
+  if (now >= next5PM) {
+    next5PM.setDate(next5PM.getDate() + 1);
   }
 
-  const timeUntilNext9AM = next9AM - now;
-  console.log(`Next message scheduled for: ${next9AM}`);
+  const timeUntilnext5PM = next5PM - now;
+  console.log(`Next message scheduled for: ${next5PM}`);
 
   setTimeout(() => {
     sendVotd();
     setInterval(sendVotd, 24 * 60 * 60 * 1000); // Repeat every 24 hours
-  }, timeUntilNext9AM);
+  }, timeUntilnext5PM);
 }
 
 function sendVotd() {
   const channel = client.channels.cache.get(dailyVerseChannelId);
-  const randomVerse = verses[Math.floor(Math.random() * verses.length)]; // Pick a random verse
+  const randomVerse = bibleVersus[Math.floor(Math.random() * verses.length)]; // Pick a random verse
 
   if (channel) {
     channel.send(`<@&${votdId}> ${randomVerse}`);
@@ -392,6 +379,14 @@ client.on("messageCreate", async (message) => {
     });
   }
 
+  //brain rot detection
+  if (brainRot.some((rot) => message.content.toLowerCase().includes(rot))) {
+    message.react("😑");
+    message.reply(
+      `yo not cool ${member.displayName} try to cut it down on the brain rot please and I know it was brain rot`
+    );
+  }
+
   if (message.content.toLowerCase().includes(lol)) {
     message.reply("lol");
     message.react(randomEmoji);
@@ -436,6 +431,7 @@ client.on("messageCreate", async (message) => {
         }));
 
         console.log(JSON.stringify(messageData, null, 2));
+        console.log("sending over data");
 
         message.reply(
           "yo yo yo sent over that data check your logs to see it let me know if you need any more help!"
@@ -557,8 +553,9 @@ client.on("interactionCreate", async (interaction) => {
           content: `heres a ${data.category} joke for ya, ${data.joke} HAHAHAHAHAHAHA`,
         });
       } catch (error) {
+        await interaction.reply({
         content: "Woah seems like i cant think straight try asking for a joke again or just ask later";
-      }
+      })
     }
     if (interaction.commandName === "rules") {
       await interaction.reply({
