@@ -30,7 +30,7 @@ client.login(process.env.DISCORD_TOKEN);
 
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
 
-import { fs } from "fs";
+import fs from "fs";
 
 const JokeApi =
   "https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,religious,racist,sexist&type=single";
