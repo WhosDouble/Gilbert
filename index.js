@@ -510,7 +510,7 @@ client.on("interactionCreate", async (interaction) => {
   if (interaction.customId === "AboutGilbert") {
     await interaction.reply({
       content:
-        "My name is Gilbert! My favorite food is a classic burrito and I'm a Discord bot created by a very swag dude named Rango(aka Double). I was created on 3/18/2025 around 3:30pm. Pretty cool, right? 😎",
+        "My name is Gilbert! My favorite food is a classic burrito I love Video Games and I'm a super cool Discord bot created by a very swag dude named Rango(aka Double). I was created on 3/18/2025 around 3:30pm. Pretty cool, right? 😎",
       ephemeral: true, // visible to everyone, set to true for user-only visibility
     });
   }
