@@ -30,6 +30,8 @@ client.login(process.env.DISCORD_TOKEN);
 
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
 
+const fs = require("fs")
+
 const JokeApi =
   "https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,religious,racist,sexist&type=single";
 
@@ -46,6 +48,43 @@ async function getJoke() {
   }
 }
 
+//storing count in json
+const countFilePath = path.join(__dirname, "choclateCount.json")
+
+let choclateCount = 0
+
+if (fs.existsSync(countFilePath)) {
+  const data = fs.readFileSync(countFilePath, 'utf8');
+  const parsedData = JSON.parse(data);
+  chocolateCount = parsedData.count || 0;
+}
+
+const emojis = [
+  "😈",
+  "😎",
+  "😐",
+  "😑",
+  "😡",
+  "😕",
+  "😀",
+  "😤",
+  "🤩",
+  "😛",
+]
+
+const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)]
+
+const mj = [
+  "micheal jackson",
+  "mj",
+  "mike jackson",
+  "m. jackson",
+  "m jackson",
+  "Michael J. Jackson",
+  "Michael J.",
+  "Jackson, Michael",
+]
+
 const greeting = [
   "hello",
   "hi",
@@ -60,8 +99,7 @@ const greeting = [
   "ello",
 ];
 
-const randomGreetIndex = Math.floor(Math.random() * greeting.length);
-const randomGreet = greeting[randomGreetIndex];
+const randomGreet = greeting[Math.floor(Math.random() * greeting.length)];
 
 const thanks = [
   "thanks",
@@ -260,6 +298,29 @@ client.on("messageCreate", async (message) => {
     });
     return; // Ensure no further checks are done for this message
   }
+  if (message.content.toLowerCase().includes('chocolate')) {
+    // Increment the chocolate count
+    chocolateCount++;
+
+    // Save the updated count to the file
+    const updatedData = { count: chocolateCount };
+    fs.writeFileSync(countFilePath, JSON.stringify(updatedData, null, 2), 'utf8');
+
+    // React to the message with a chocolate emoji
+    message.react('🍫');
+    
+    // Reply to the message with the updated count
+    message.reply(`wow chocolate has been said ${chocolateCount} times. Way to go Luca ${randomEmoji}`);
+  }
+});
+
+  client.on('messageCreate', (message) => {
+    // Check if the message contains the word "chocolate" (case-insensitive)
+    if (message.content.toLowerCase().includes(mj)) {
+      // React to the message with a chocolate emoji
+      message.reply('yes yes luca weve heard it 1000');
+    }
+  });
 
   if (
     thanks.some(
