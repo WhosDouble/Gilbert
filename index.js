@@ -269,7 +269,7 @@ client.on("messageCreate", async (message) => {
     client.listeners("messageCreate").length
   );
   console.log(message.content);
-  console.log("message recived");
+  console.log("message received");
 
   // Ignore messages from bots
   if (message.author.bot) return;
@@ -281,72 +281,63 @@ client.on("messageCreate", async (message) => {
         message.content.toLowerCase().endsWith("gilbert")
     )
   ) {
-    // Respond only once for greetings
     await message.channel.send({
       content: `${randomGreet} ${member.displayName} that's meee! How can I help you today?`,
-      components: [row], // Multiple Buttons need to be wrapped inside an action row
+      components: [row],
       ephemeral: false,
-    }); // Ensure no further checks are done for this message
+    });
   }
-  if (message.content.toLowerCase().includes("chocolate")) {
-    // Increment the chocolate count
-    chocolateCount++;
 
-    // Save the updated count to the file
+  if (message.content.toLowerCase().includes("chocolate")) {
+    chocolateCount++;
     const updatedData = { count: chocolateCount };
     fs.writeFileSync(
       countFilePath,
       JSON.stringify(updatedData, null, 2),
       "utf8"
     );
-
-    // React to the message with a chocolate emoji
     message.react("🍫");
-
-    // Reply to the message with the updated count
     message.reply(
       `wow chocolate has been said ${chocolateCount} times. Way to go Luca ${randomEmoji}`
     );
   }
+
+  // Check for mentions of Michael Jackson
+  if (message.content.toLowerCase().includes(mj.join(" "))) {
+    message.react("🕺");
+    await message.channel.send({
+      content: "yes yes Luca we've heard it a 1000 times",
+    });
+  }
+
+  if (
+    thanks.some(
+      (thank) =>
+        message.content.toLowerCase().includes(thank) &&
+        message.content.toLowerCase().endsWith("gilbert")
+    )
+  ) {
+    await message.channel.send({
+      content: `No problema😉 Thank you ${member.displayName} For thanking me 😎`,
+      ephemeral: false,
+    });
+  }
+
+  if (message.content.toLowerCase().includes("sad")) {
+    await message.channel.send({
+      content: "Oh no I hope no one is sad 😞",
+    });
+  }
+
+  if (
+    message.content.toLowerCase().includes("sorry") &&
+    message.content.toLowerCase().endsWith("gilbert")
+  ) {
+    await message.channel.send({
+      content: "It's ok humans make mistakes, but Gilbert doesn't 😐",
+    });
+  }
 });
-
-if (message.content.toLowerCase().includes(mj)) {
-  message.react("🕺");
-  await message.channel.send({
-    content: message.reply("yes yes luca weve heard it a 1000 times"),
-  });
-}
-
-if (
-  thanks.some(
-    (thank) =>
-      message.content.toLowerCase().includes(thank) &&
-      message.content.toLowerCase().endsWith("gilbert")
-  )
-) {
-  // Respond only once for thanks
-  await message.channel.send({
-    content: `No problema😉 Thank you ${member.displayName} For thanking me 😎`,
-    ephemeral: false,
-  }); // Ensure no further checks are done for this message
-}
-
-if (message.content.toLowerCase().includes("sad")) {
-  // Respond only once for sad messages
-  await message.channel.send({
-    content: "Oh no I hope no one is sad 😞",
-  }); // Ensure no further checks are done for this message
-}
-
-if (
-  message.content.toLowerCase().includes("sorry") &&
-  message.content.toLowerCase().endsWith("gilbert")
-) {
-  // Respond only once for sorry messages
-  await message.channel.send({
-    content: "It's ok humans make mistakes, but Gilbert doesn't 😐",
-  }); // Ensure no further checks are done for this message
-}
 
 client.on("interactionCreate", async (interaction) => {
   // Ensure the interaction is a button press
