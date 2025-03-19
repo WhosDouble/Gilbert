@@ -443,7 +443,7 @@ function makeRequest(channelId, lastMessageId = null) {
       }`,
       method: "GET",
       headers: {
-        Authorization: `Bot ${DISCORD_TOKEN}`,
+        Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
       },
     };
 
@@ -484,7 +484,7 @@ client.on("interactionCreate", async (interaction) => {
   if (interaction.customId === "AnythingNew") {
     await interaction.reply({
       content:
-        "I now can feel emotions rango has isntalled intellegence in my brain try asking me something make sure the sentence starts with my name! Rango will soon make it where you can select what type of joke I will tell. Rango has alot of plans to add more wacky interactions! Try `/help` to see what I can do now.",
+        "now i have a new command Rango has adujusted my personality and plans on training my brain soon. try asking me something make sure the sentence starts with my name! Rango will soon make it where you can select what type of joke I will tell. Rango has alot of plans to add more wacky interactions! Try `/help` to see what I can do now.",
       ephemeral: true,
     });
   }
