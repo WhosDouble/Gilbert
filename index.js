@@ -61,7 +61,22 @@ if (fs.existsSync(countFilePath)) {
   chocolateCount = parsedData.count || 0;
 }
 
-const emojis = ["😈", "😎", "😐", "😑", "😡", "😕", "😀", "😤", "🤩", "😛"];
+const emojis = [
+  "😈",
+  "😎",
+  "😐",
+  "😑",
+  "😡",
+  "😕",
+  "😀",
+  "😤",
+  "🤩",
+  "😛",
+  "😁",
+  "😋",
+  "☹",
+  "😝",
+];
 
 const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
 
@@ -302,8 +317,17 @@ client.on("messageCreate", async (message) => {
     );
   }
 
+  if (
+    message.content.toLowerCase().includes("its ok gilbert" | "its ok gilly")
+  ) {
+    message.react("😅");
+    await message.channel.send({
+      content: "thanks I appreciate that im feeling better already",
+    });
+  }
+
   // Check for mentions of Michael Jackson
-  if (message.content.toLowerCase().includes(mj.join(" "))) {
+  if (message.content.toLowerCase().includes(mj)) {
     message.react("🕺");
     await message.channel.send({
       content: "yes yes Luca we've heard it a 1000 times",
