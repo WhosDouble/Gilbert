@@ -289,20 +289,7 @@ client.on("messageCreate", async (message) => {
   // Ignore messages from bots
   if (message.author.bot) return;
 
-  if (
-    greeting.some(
-      (greet) =>
-        message.content.toLowerCase().startsWith(greet) &&
-        message.content.toLowerCase().endsWith("gilbert")
-    )
-  ) {
-    await message.channel.send({
-      content: `${randomGreet} ${member.displayName} that's meee! How can I help you today?`,
-      components: [row],
-      ephemeral: false,
-    });
-  }
-
+  // Handle chocolate mention
   if (message.content.toLowerCase().includes("chocolate")) {
     try {
       // Increment the chocolate count in the database
@@ -326,43 +313,61 @@ client.on("messageCreate", async (message) => {
       message.reply("Oops, something went wrong with the chocolate count!");
     }
   }
+
+  // Check for mentions of Michael Jackson
+  if (mj.some((name) => message.content.toLowerCase().includes(name))) {
+    message.react("🕺");
+    await message.channel.send({
+      content: "yes yes Luca we've heard it a 1000 times",
+    });
+  }
+
+  // Handle greetings
+  if (
+    greeting.some(
+      (greet) =>
+        message.content.toLowerCase().startsWith(greet) &&
+        message.content.toLowerCase().endsWith("gilbert")
+    )
+  ) {
+    await message.channel.send({
+      content: `${randomGreet} ${member.displayName} that's meee! How can I help you today?`,
+      components: [row],
+      ephemeral: false,
+    });
+  }
+
+  // Handle "thanks" messages
+  if (
+    thanks.some(
+      (thank) =>
+        message.content.toLowerCase().includes(thank) &&
+        message.content.toLowerCase().endsWith("gilbert")
+    )
+  ) {
+    await message.channel.send({
+      content: `No problema😉 Thank you ${member.displayName} For thanking me 😎`,
+      ephemeral: false,
+    });
+  }
+
+  // Handle "sad" messages
+  if (message.content.toLowerCase().includes("sad")) {
+    await message.channel.send({
+      content: "Oh no I hope no one is sad 😞",
+    });
+  }
+
+  // Handle "sorry" messages
+  if (
+    message.content.toLowerCase().includes("sorry") &&
+    message.content.toLowerCase().endsWith("gilbert")
+  ) {
+    await message.channel.send({
+      content: "It's ok humans make mistakes, but Gilbert doesn't 😐",
+    });
+  }
 });
-
-// Check for mentions of Michael Jackson
-if (message.content.toLowerCase().includes(mj)) {
-  message.react("🕺");
-  await message.channel.send({
-    content: "yes yes Luca we've heard it a 1000 times",
-  });
-}
-
-if (
-  thanks.some(
-    (thank) =>
-      message.content.toLowerCase().includes(thank) &&
-      message.content.toLowerCase().endsWith("gilbert")
-  )
-) {
-  await message.channel.send({
-    content: `No problema😉 Thank you ${member.displayName} For thanking me 😎`,
-    ephemeral: false,
-  });
-}
-
-if (message.content.toLowerCase().includes("sad")) {
-  await message.channel.send({
-    content: "Oh no I hope no one is sad 😞",
-  });
-}
-
-if (
-  message.content.toLowerCase().includes("sorry") &&
-  message.content.toLowerCase().endsWith("gilbert")
-) {
-  await message.channel.send({
-    content: "It's ok humans make mistakes, but Gilbert doesn't 😐",
-  });
-}
 
 client.on("interactionCreate", async (interaction) => {
   // Ensure the interaction is a button press
