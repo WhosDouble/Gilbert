@@ -50,6 +50,7 @@ async function getJoke() {
 }
 
 //storing count in json
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const countFilePath = path.join(__dirname, "choclateCount.json");
 
 let choclateCount = 0;
