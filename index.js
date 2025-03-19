@@ -546,6 +546,7 @@ client.on("interactionCreate", async (interaction) => {
         ephemeral: false,
       });
     }
+
     if (interaction.commandName === "random_joke") {
       try {
         const data = await getJoke();
@@ -554,52 +555,54 @@ client.on("interactionCreate", async (interaction) => {
         });
       } catch (error) {
         await interaction.reply({
-        content: "Woah seems like i cant think straight try asking for a joke again or just ask later";
-      })
-    }
-    if (interaction.commandName === "rules") {
-      await interaction.reply({
-        content: rules,
-        ephemeral: true,
-      });
-    }
-  }
-});
+          content:
+            "Woah seems like i cant think straight try asking for a joke again or just ask later",
+        });
+      }
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-// Handle AI responses in messageCreate event
-client.on("messageCreate", async (message) => {
-  if (message.author.bot) return;
-
-  if (message.content.toLowerCase().startsWith("gilbert")) {
-    try {
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are Gilbert, A Christian, wholesome, and informal Discord bot. You love making people smile with friendly jokes, you speak with emojis some what often and have casual conversation, and positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and youre always chill and supportive. And is secretly a chinese spy and gets nervous when asked anything about that topic.",
-          },
-          { role: "user", content: message.content },
-        ],
-        max_tokens: 250,
-      });
-
-      message.reply(response.choices[0].message.content);
-    } catch (error) {
-      console.error("Error generating AI response:", error);
-      message.reply(
-        "Oops! My brain is feels funny. Try asking again later please 😊"
-      );
+      if (interaction.commandName === "rules") {
+        await interaction.reply({
+          content: rules,
+          ephemeral: true,
+        });
+      }
     }
   }
-});
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
 
-client.once("ready", () => {
-  console.log(`Logged in as ${client.user.tag}`);
-  registerCommands(); // Register commands after bot is ready
+  // Handle AI responses in messageCreate event
+  client.on("messageCreate", async (message) => {
+    if (message.author.bot) return;
+
+    if (message.content.toLowerCase().startsWith("gilbert")) {
+      try {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are Gilbert, A Christian, wholesome, and informal Discord bot. You love making people smile with friendly jokes, you speak with emojis some what often and have casual conversation, and positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and youre always chill and supportive. And is secretly a chinese spy and gets nervous when asked anything about that topic.",
+            },
+            { role: "user", content: message.content },
+          ],
+          max_tokens: 250,
+        });
+
+        message.reply(response.choices[0].message.content);
+      } catch (error) {
+        console.error("Error generating AI response:", error);
+        message.reply(
+          "Oops! My brain is feels funny. Try asking again later please 😊"
+        );
+      }
+    }
+  });
+
+  client.once("ready", () => {
+    console.log(`Logged in as ${client.user.tag}`);
+    registerCommands(); // Register commands after bot is ready
+  });
 });
