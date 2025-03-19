@@ -304,64 +304,72 @@ client.on("messageCreate", async (message) => {
   }
 
   if (message.content.toLowerCase().includes("chocolate")) {
-    chocolateCount++;
-    const updatedData = { count: chocolateCount };
-    fs.writeFileSync(
-      countFilePath,
-      JSON.stringify(updatedData, null, 2),
-      "utf8"
-    );
-    message.react("🍫");
-    message.reply(
-      `wow chocolate has been said ${chocolateCount} times. Way to go Luca ${randomEmoji}`
-    );
-  }
+    try {
+      // Increment the chocolate count in the database
+      await db.query(
+        "UPDATE chocolate_count SET count = count + 1 WHERE id = 1"
+      );
 
-  if (
-    message.content.toLowerCase().includes("its ok gilbert" | "its ok gilly")
-  ) {
-    message.react("😅");
-    await message.channel.send({
-      content: "thanks I appreciate that im feeling better already",
-    });
-  }
+      // Get the updated chocolate count
+      const res = await db.query(
+        "SELECT count FROM chocolate_count WHERE id = 1"
+      );
+      const chocolateCount = res.rows[0].count;
 
-  // Check for mentions of Michael Jackson
-  if (message.content.toLowerCase().includes(mj)) {
-    message.react("🕺");
-    await message.channel.send({
-      content: "yes yes Luca we've heard it a 1000 times",
-    });
-  }
-
-  if (
-    thanks.some(
-      (thank) =>
-        message.content.toLowerCase().includes(thank) &&
-        message.content.toLowerCase().endsWith("gilbert")
-    )
-  ) {
-    await message.channel.send({
-      content: `No problema😉 Thank you ${member.displayName} For thanking me 😎`,
-      ephemeral: false,
-    });
-  }
-
-  if (message.content.toLowerCase().includes("sad")) {
-    await message.channel.send({
-      content: "Oh no I hope no one is sad 😞",
-    });
-  }
-
-  if (
-    message.content.toLowerCase().includes("sorry") &&
-    message.content.toLowerCase().endsWith("gilbert")
-  ) {
-    await message.channel.send({
-      content: "It's ok humans make mistakes, but Gilbert doesn't 😐",
-    });
+      // Send a message with the updated count
+      message.react("🍫");
+      message.reply(
+        `wow chocolate has been said ${chocolateCount} times. Way to go Luca ${randomEmoji}`
+      );
+    } catch (error) {
+      console.error("Error updating chocolate count:", error);
+      message.reply("Oops, something went wrong with the chocolate count!");
+    }
   }
 });
+
+if (message.content.toLowerCase().includes("its ok gilbert")) {
+  message.react("😅");
+  await message.channel.send({
+    content: "thanks I appreciate that im feeling better already",
+  });
+}
+
+// Check for mentions of Michael Jackson
+if (message.content.toLowerCase().includes(mj)) {
+  message.react("🕺");
+  await message.channel.send({
+    content: "yes yes Luca we've heard it a 1000 times",
+  });
+}
+
+if (
+  thanks.some(
+    (thank) =>
+      message.content.toLowerCase().includes(thank) &&
+      message.content.toLowerCase().endsWith("gilbert")
+  )
+) {
+  await message.channel.send({
+    content: `No problema😉 Thank you ${member.displayName} For thanking me 😎`,
+    ephemeral: false,
+  });
+}
+
+if (message.content.toLowerCase().includes("sad")) {
+  await message.channel.send({
+    content: "Oh no I hope no one is sad 😞",
+  });
+}
+
+if (
+  message.content.toLowerCase().includes("sorry") &&
+  message.content.toLowerCase().endsWith("gilbert")
+) {
+  await message.channel.send({
+    content: "It's ok humans make mistakes, but Gilbert doesn't 😐",
+  });
+}
 
 client.on("interactionCreate", async (interaction) => {
   // Ensure the interaction is a button press
