@@ -386,8 +386,13 @@ client.on("messageCreate", async (message) => {
       content: "It's ok humans make mistakes, but Gilbert doesn't 😐",
     });
   }
-
-  // Check if the message starts with !getmessages and if the user is an admin
+  //checks if a message contains the key word "fortnite"
+  if (message.content.toLowerCase().includes("fortnite")) {
+    message.reply("💩");
+    await message.channel.send({
+      content: "that game is mid",
+    });
+  }
   // Check if the message starts with !getmessages and if the user is an admin
   if (message.content.toLowerCase().startsWith("!getmessages")) {
     if (message.member.permissions.has("ADMINISTRATOR")) {
@@ -396,12 +401,20 @@ client.on("messageCreate", async (message) => {
 
       try {
         const messages = await getMessages(channelId, 200);
+
+        const messageData = messages.map((msg) => ({
+          messageId: msg.id,
+          content: msg.content,
+          authorId: msg.author.id,
+          authorUsername: msg.author.username,
+          authorDiscriminator: msg.author.discriminator,
+          timestamp: msg.createdTimestamp,
+        }));
+
+        console.log(JSON.stringify(messageData, null, 2));
+
         message.reply(
-          `Here are the messages in the channel:\n\`\`\`json\n${JSON.stringify(
-            messages,
-            null,
-            2
-          )}\n\`\`\``
+          "yo yo yo sent over that data check your logs to see it let me know if you need any more help!"
         );
       } catch (error) {
         message.reply("An error occurred while fetching the messages.");
