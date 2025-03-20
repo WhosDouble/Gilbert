@@ -174,14 +174,16 @@ const commands = [
     description: "Flowing Faith server rules",
   },
   {
-    name: "server_stats",
+    name: "serverinfo",
     description: "get the server stats",
   },
   {
-    name: "user_stats",
+    name: "userinfo",
     description: "get stats on yourself",
   },
 ];
+
+const member = await message.guild.members.fetch(message.author.id);
 
 async function registerCommands() {
   try {
@@ -205,7 +207,6 @@ const welcomeId = "1227288321152122972";
 const welcomeChannel = client.channels.cache.get(welcomeId);
 
 client.on("guildMemberAdd", async (member) => {
-  const member = await message.guild.members.fetch(message.author.id);
   try {
     if (welcomeChannel) {
       welcomeChannel.send(
@@ -290,10 +291,6 @@ function sendVotd() {
 
 // the bot picking up on messages sent and responding accordingly
 client.on("messageCreate", async (message) => {
-  const member = await message.guild.members.fetch(message.author.id);
-  console.log(message.content);
-  console.log("message received");
-
   // Ignore messages from bots
   if (message.author.bot) return;
 
@@ -326,7 +323,7 @@ client.on("messageCreate", async (message) => {
   if (mj.some((mj) => message.content.toLowerCase().includes(mj))) {
     message.react("🕺");
     await message.channel.send({
-      content: `now thats a cool artitst ${member.displayName} be sure not to spam his name too much tho\n-# luca`,
+      content: `now thats a cool artist ${member.displayName}`,
     });
   }
 
@@ -479,7 +476,7 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.commandName === "help") {
       await interaction.reply({
         content:
-          "Here are the available commands\n- `/help` - Lists all available commands\n- `/rules` - The Flowing Faith rule\n- `/user_stats` - sends user stats\n- `/server_stats` - sends server stats",
+          "Here are the available commands\n- `/help` - Lists all available commands\n- `/rules` - The Flowing Faith rule\n- `/userinfo` - sends user stats\n- `/serverinfo` - sends server stats",
         ephemeral: true,
       });
     }
@@ -503,14 +500,14 @@ client.on("interactionCreate", async (interaction) => {
       });
     }
 
-    if (interaction.commandName === "server_stats") {
+    if (interaction.commandName === "serverinfo") {
       await interaction.reply({
         content: `${guild.memberCount}\n- ${guild.createdAt}\n- ${guild.description}`,
         ephemeral: true,
       });
     }
 
-    if (interaction.commandName === "user_stats") {
+    if (interaction.commandName === "userinfo") {
       await interaction.reply({
         content: `${user.tag}\n- ${user.createdAt}\n- ${user.joinedAt}\n- ${member.presence?.activities}`,
         ephemeral: true,
