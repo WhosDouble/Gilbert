@@ -402,7 +402,7 @@ client.on("messageCreate", async (message) => {
     message.content.toLowerCase().startsWith("gilbert") ||
     message.reference?.messageId
   ) {
-    let pastMessages = [];
+    let pastMessages = lastMessages.get(message.author.id) || [];
 
     // If replying to Gilbert, fetch the last message from Gilbert
     if (message.reference?.messageId) {
