@@ -398,63 +398,64 @@ client.on("messageCreate", async (message) => {
     });
   }
 
-  if (message.reference?.messageId) {
-    try {
-      const referencedMessage = await message.fetchReference();
-      if (referencedMessage.author.id === client.user.id) {
-        pastMessages.push({
-          role: "assistant",
-          content: referencedMessage.content,
-        }); // Store Gilbert's last message
+  if (
+    message.content.toLowerCase().startsWith("gilbert") ||
+    message.reference?.messageId
+  ) {
+    // Initialize pastMessages to store conversation history for the user
+    let pastMessages = pastMessages.get(message.author.id) || [];
+
+    // If replying to a previous message, fetch the referenced message
+    if (message.reference?.messageId) {
+      try {
+        const referencedMessage = await message.fetchReference();
+        if (referencedMessage.author.id === client.user.id) {
+          pastMessages.push({
+            role: "assistant",
+            content: referencedMessage.content,
+          }); // Store Gilbert's last message
+        }
+      } catch (error) {
+        console.error("Error fetching referenced message:", error);
       }
-    } catch (error) {
-      console.error("Error fetching referenced message:", error);
     }
-  }
 
-  // Check if the user has a stored message
-  // Use .some() to check if the pastMessages array contains a message from this user
-  if (!pastMessages.some((msg) => msg.role === "user" && msg.content)) {
-    console.log(
-      "No previous message from the user found, pastMessages won't be reset."
-    );
-    // Only clear pastMessages in specific cases, such as when pastMessages is empty or needs resetting
-    // pastMessages = [];  // Remove this line unless necessary
-  }
+    // Add the current message to the conversation history
+    pastMessages.push({ role: "user", content: message.content });
 
-  // Add the current message to the conversation history
-  pastMessages.push({ role: "user", content: message.content });
+    // Keep only the last 15 messages
+    if (pastMessages.length > 15) {
+      pastMessages.shift();
+    }
 
-  // Keep only the last 15 messages
-  if (pastMessages.length > 15) {
-    pastMessages.shift();
-  }
+    try {
+      const messages = [
+        {
+          role: "system",
+          content:
+            "You're a gecko called Gilbert, you are a Christian, wholesome, and informal. You love making people smile, you speak with emojis sometimes and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and you're always chill and supportive.",
+        },
+        ...pastMessages, // Add the pastMessages array to the context
+      ];
 
-  try {
-    const messages = [
-      {
-        role: "system",
-        content:
-          "You're a gecko called Gilbert, you are a Christian, wholesome, and informal. You love making people smile, you speak with emojis sometimes and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and you're always chill and supportive.",
-      },
-      ...pastMessages, // Add the pastMessages array to the context
-    ];
+      // Generate AI response
+      const response = await openai.chat.completions.create({
+        model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert:BCxuH5NY",
+        messages: messages,
+        max_tokens: 165,
+      });
 
-    // Generate AI response
-    const response = await openai.chat.completions.create({
-      model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert:BCxuH5NY",
-      messages: messages,
-      max_tokens: 165,
-    });
+      const gilbertReply = response.choices[0].message.content;
+      message.reply(gilbertReply);
 
-    const gilbertReply = response.choices[0].message.content;
-    message.reply(gilbertReply);
-
-    // Store the updated conversation history in lastMessages
-    pastMessages.set(message.author.id, pastMessages);
-  } catch (error) {
-    console.error("Error generating AI response:", error);
-    message.reply("dang man my brain feels weird. Try again later, please 😊");
+      // Store the updated conversation history in lastMessages
+      pastMessages.set(message.author.id, pastMessages);
+    } catch (error) {
+      console.error("Error generating AI response:", error);
+      message.reply(
+        "dang man my brain feels weird. Try again later, please 😊"
+      );
+    }
   }
 });
 // interactions down here so commands buttons etc
