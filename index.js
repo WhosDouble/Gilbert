@@ -226,8 +226,8 @@ async function registerCommands() {
 const welcomeId = "1227288321152122972";
 const welcomeChannel = client.channels.cache.get(welcomeId);
 
-let member = await message.guild.members.fetch(message.author.id);
-client.on("guildMemberAdd", async (member) => {
+client.on("guildMemberAdd", async (member, message) => {
+  let member = await message.guild.members.fetch(message.author.id);
   try {
     if (welcomeChannel) {
       welcomeChannel.send(
