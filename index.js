@@ -444,7 +444,7 @@ client.on("messageCreate", async (message) => {
 
       // If there's past messages, include it as context
       if (pastMessages) {
-        messages.push({ role: "assistant", content: pastMessage });
+        messages.push({ role: "assistant", content: pastMessages });
       }
 
       messages.push({ role: "user", content: message.content });
