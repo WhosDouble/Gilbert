@@ -1,7 +1,8 @@
 # **Gilbert - Your Personal Discord AI Assistant**
 (he only works for one server right now)
 
-Gilbert is a smart, AI-powered assistant designed to enhance your Discord experience. Whether you need quick answers, server insights, or conversational AI, Gilbert is here to help!  
+Gilbert is a smart, AI-powered assistant designed to enhance your Discord experience. Whether you need quick answers, server insights, or conversational AI, Gilbert is here to help!
+This is my very first discord bot so his purpose is a little all over the place as i created him to learn
 
 ## 🚀 **Features**  
 - 🧠 **AI-Powered Responses** – Chat with Gilbert using advanced AI capabilities.  
