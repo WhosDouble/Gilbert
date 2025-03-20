@@ -18,32 +18,7 @@ const openai = new OpenAI({
 });
 
 import db from "./db.js";
-
-const rules = `yo yo welcome to the Flowing Faith server We are honored to have you join our server and hope you have a positive and impacting experience in this Christian server 🙏🏽
-
-Here are some rules we expect you to follow in this server:
-
-• NO **NSFW** PERMITTED ❌
-
-• Do **NOT** share **ANY** personal information whether it’s your’s or someone else’s ❌
-
-• This is **NOT** a dating server ❌
-
-•  No proselytizing/promoting other religions (You may talk about your religion, but the attempt of converting Christians into your religion is strictly prohibited and will result to instant ban) ❌
-
-• We will not tolerate any form of bullying or harassment ❌
-
-• No inappropriate, unsafe, or demonic content (this includes profile pictures, statuses, bios, etc..) ❌
-
-• You must be 13 years old or above to join the server ❌
-
-• Use appropriate channels ❌
-
-• No vulgar/ crude language ❌
-
-• No spamming ❌
-
-gilbert loves cooperation. Let’s have this server Christ centered and appropriate gilbert out 🙌🏽`;
+import { rules } from "./files/rules.js";
 
 const client = new Client({
   intents: [
@@ -196,11 +171,11 @@ const commands = [
     description: "Flowing Faith server rules",
   },
   {
-    name: "server_info",
+    name: "serverinfo",
     description: "get the server stats",
   },
   {
-    name: "user_info",
+    name: "userinfo",
     description: "get stats on yourself",
   },
 ];
@@ -487,7 +462,7 @@ client.on("interactionCreate", async (interaction) => {
   if (interaction.customId === "AnythingNew") {
     await interaction.reply({
       content:
-        "i now have the ability to remember things yayyy there is a limit on my memory for now but still cool right rango has now done one generation of training me so my personality is a little more well me lol try asking me something make sure the sentence starts with my name! Rango will soon make it where you can select what type of joke I will tell. Rango has alot of plans to add more wacky interactions! Try `/help` to see what I can do now.",
+        "i have new commands i have the ability to remember things yayyy there is a limit on my memory for now but still cool right rango has now done one generation of training me so my personality is a little more well me lol try asking me something make sure the sentence starts with my name! Rango has alot of plans to add more wacky interactions! Try `/help` to see what I can do now.",
       ephemeral: true,
     });
   }
