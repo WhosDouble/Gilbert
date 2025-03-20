@@ -196,11 +196,11 @@ const commands = [
     description: "Flowing Faith server rules",
   },
   {
-    name: "serverinfo",
+    name: "server_info",
     description: "get the server stats",
   },
   {
-    name: "userinfo",
+    name: "user_info",
     description: "get stats on yourself",
   },
 ];
@@ -226,7 +226,7 @@ async function registerCommands() {
 const welcomeId = "1227288321152122972";
 const welcomeChannel = client.channels.cache.get(welcomeId);
 
-client.on("guildMemberAdd", async (member, message) => {
+client.on("guildMemberAdd", async (member) => {
   try {
     if (welcomeChannel) {
       welcomeChannel.send(
@@ -266,7 +266,7 @@ function sendBumpReminder() {
   const channel = client.channels.cache.get(bumpChannelId);
   if (channel) {
     channel.send(
-      `⏰ <@&${bumpId}> ⏰\n- ### yo yo yo 🗣 it's been two hours bros, time to get bumpin 🤜`
+      `⏰ <@&${bumpId}> ⏰\n- yo yo yo 🗣 it's been two hours bros, time to get bumpin 🤜`
     );
     console.log("Bump reminder sent!");
   } else {
@@ -499,18 +499,6 @@ client.on("interactionCreate", async (interaction) => {
         content:
           "Here are the available commands\n- `/help` - Lists all available commands\n- `/rules` - The Flowing Faith rule\n- `/userinfo` - sends user stats\n- `/serverinfo` - sends server stats",
         ephemeral: true,
-      });
-    }
-    if (interaction.commandName === "random_pickup_line") {
-      const randomPickUpLineIndex = Math.floor(
-        Math.random() * pickUpLines.length
-      );
-
-      const randomPickUpLine = pickUpLines[randomPickUpLineIndex];
-
-      await interaction.reply({
-        content: randomPickUpLine,
-        ephemeral: false,
       });
     }
 
