@@ -170,10 +170,6 @@ const commands = [
     description: "List all available commands",
   },
   {
-    name: "random_pickup_line",
-    description: "sends a random Christian friendly pickup line",
-  },
-  {
     name: "rules",
     description: "Flowing Faith server rules",
   },
@@ -205,12 +201,12 @@ async function registerCommands() {
     console.error(error);
   }
 }
+const welcomeId = "1227288321152122972";
+const welcomeChannel = client.channels.cache.get(welcomeId);
 
 client.on("guildMemberAdd", async (member) => {
+  const member = await message.guild.members.fetch(message.author.id);
   try {
-    const welcomeChannel = "1227288321152122972";
-    const member = await message.guild.members.fetch(message.author.id);
-
     if (welcomeChannel) {
       welcomeChannel.send(
         `Heyo ${member.displayName}! heres a Big welcome to the Flowing Faith server!`
@@ -483,7 +479,7 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.commandName === "help") {
       await interaction.reply({
         content:
-          "Here are the available commands\n- `/help` - Lists all available commands\n- `/random_pickup_line` - Sends a random Christian friendly pickup line\n- `/rules` - The Flowing Faith rule",
+          "Here are the available commands\n- `/help` - Lists all available commands\n- `/rules` - The Flowing Faith rule\n- `/user_stats` - sends user stats\n- `/server_stats` - sends server stats",
         ephemeral: true,
       });
     }
