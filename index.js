@@ -205,8 +205,6 @@ const commands = [
   },
 ];
 
-const member = await message.guild.members.fetch(message.author.id);
-
 async function registerCommands() {
   try {
     console.log("Initiated Koolaid protocol...");
@@ -229,6 +227,7 @@ const welcomeId = "1227288321152122972";
 const welcomeChannel = client.channels.cache.get(welcomeId);
 
 client.on("guildMemberAdd", async (member) => {
+  let member = await message.guild.members.fetch(message.author.id);
   try {
     if (welcomeChannel) {
       welcomeChannel.send(
@@ -313,6 +312,7 @@ function sendVotd() {
 
 // the bot picking up on messages sent and responding accordingly
 client.on("messageCreate", async (message) => {
+  let member = await message.guild.members.fetch(message.author.id);
   // Ignore messages from bots
   if (message.author.bot) return;
 
