@@ -329,7 +329,7 @@ client.on("messageCreate", async (message) => {
   if (mj.some((mj) => message.content.toLowerCase().includes(mj))) {
     message.react("🕺");
     await message.channel.send({
-      content: `now thats a cool artitst ${member.displayName} be sure not to spam his name too much tho\n -# luca`,
+      content: `now thats a cool artitst ${member.displayName} be sure not to spam his name too much tho\n-# luca`,
     });
   }
 
@@ -481,7 +481,7 @@ client.on("interactionCreate", async (interaction) => {
   if (interaction.customId === "AnythingNew") {
     await interaction.reply({
       content:
-        "now i have a new command Rango has adujusted my personality and plans on training my brain soon. try asking me something make sure the sentence starts with my name! Rango will soon make it where you can select what type of joke I will tell. Rango has alot of plans to add more wacky interactions! Try `/help` to see what I can do now.",
+        "i now have the ability to remember things yayyy there is a limit on my memory for now but still cool right rango has now done one generation of training me so my personality is a little more well me lol try asking me something make sure the sentence starts with my name! Rango will soon make it where you can select what type of joke I will tell. Rango has alot of plans to add more wacky interactions! Try `/help` to see what I can do now.",
       ephemeral: true,
     });
   }
