@@ -44,24 +44,9 @@ import path from "path";
 const JokeApi =
   "https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,religious,racist,sexist&type=single";
 
-//calling joke API
-
-async function getJoke() {
-  try {
-    const response = await fetch(JokeApi);
-    const data = await response.json();
-    console.log(data);
-    return data;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 //storing count in json
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const countFilePath = path.join(__dirname, "choclateCount.json");
-
-let chocolateCount = 0;
 
 if (fs.existsSync(countFilePath)) {
   const data = fs.readFileSync(countFilePath, "utf8");
@@ -275,28 +260,24 @@ function sendBumpReminder() {
 const dailyVerseChannelId = "1227297701318889542";
 const votdId = "1228395980898963516";
 
-client.once("ready", () => {
-  scheduleDailyMessage();
-});
-
 function scheduleDailyMessage() {
   const now = new Date();
-  const next5PM = new Date();
+  const next7AM = new Date();
 
-  next5PM.setHours(17, 0, 0, 0); // Set time to 9:00:00 AM
+  next7AM.setHours(7, 0, 0, 0); // Set time to 7:00:00 AM
 
   // If it's already past 9 AM today, schedule for tomorrow
-  if (now >= next5PM) {
-    next5PM.setDate(next5PM.getDate() + 1);
+  if (now >= next7AM) {
+    next7AM.setDate(next7AM.getDate() + 1);
   }
 
-  const timeUntilnext5PM = next5PM - now;
-  console.log(`Next message scheduled for: ${next5PM}`);
+  const timeUntilnext7AM = next7AM - now;
+  console.log(`Next message scheduled for: ${next7AM}`);
 
   setTimeout(() => {
     sendVotd();
     setInterval(sendVotd, 24 * 60 * 60 * 1000); // Repeat every 24 hours
-  }, timeUntilnext5PM);
+  }, timeUntilnext7AM);
 }
 
 function sendVotd() {
@@ -344,12 +325,12 @@ client.on("messageCreate", async (message) => {
       message.reply("Oops, something went wrong with the chocolate count!");
     }
   }
-
+  //.toLowerCase().includes(mj)
   // Check for mentions of Michael Jackson
-  if (message.content.toLowerCase().includes(mj)) {
+  if (mj.some((mj) => message.content.toLowerCase().has(mj))) {
     message.react("🕺");
     await message.channel.send({
-      content: "yes yes Luca we've heard it a 1000 times",
+      content: `now thats a cool artitst ${member.displayName} be sure not to spam his name too much tho\n -# luca`,
     });
   }
 
@@ -420,10 +401,10 @@ client.on("messageCreate", async (message) => {
 
   if (
     message.content.toLowerCase().startsWith("gilbert") ||
-    message.reference?.messageID
+    message.reference?.messageId
   ) {
     // If the message is a reply to Gilbert
-    if (message.reference?.messageID) {
+    if (message.reference?.messageId) {
       try {
         // Fetch the original message that was replied to (if it's from Gilbert)
         const referencedMessage = await message.fetchReference();
@@ -473,6 +454,7 @@ client.on("messageCreate", async (message) => {
     }
   }
 });
+// interactions down here so commands buttons etc
 client.on("interactionCreate", async (interaction) => {
   // Ensure the interaction is a button press
   if (interaction.customId === "AboutGilbert") {
@@ -498,7 +480,7 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.commandName === "help") {
       await interaction.reply({
         content:
-          "Here are the available commands\n- `/help` - Lists all available commands\n- `/random_pickup_line` - Sends a random Christian friendly pickup line\n- `/random_joke` - Sends a random joke\n- `/rules` - The Flowing Faith rules\n- `!getmessages` - only for people with admin permissions fetches messages on the channel you put the command in and converts it into json",
+          "Here are the available commands\n- `/help` - Lists all available commands\n- `/random_pickup_line` - Sends a random Christian friendly pickup line\n- `/rules` - The Flowing Faith rule",
         ephemeral: true,
       });
     }
@@ -515,30 +497,17 @@ client.on("interactionCreate", async (interaction) => {
       });
     }
 
-    if (interaction.commandName === "random_joke") {
-      try {
-        const data = await getJoke();
-        await interaction.reply({
-          content: `heres a ${data.category} joke for ya, ${data.joke} HAHAHAHAHAHAHA`,
-        });
-      } catch (error) {
-        await interaction.reply({
-          content:
-            "Woah seems like i cant think straight try asking for a joke again or just ask later",
-        });
-      }
-
-      if (interaction.commandName === "rules") {
-        await interaction.reply({
-          content: rules,
-          ephemeral: true,
-        });
-      }
+    if (interaction.commandName === "rules") {
+      await interaction.reply({
+        content: rules,
+        ephemeral: true,
+      });
     }
   }
 
   client.once("ready", () => {
     console.log(`Logged in as ${client.user.tag}`);
     registerCommands(); // Register commands after bot is ready
+    scheduleDailyMessage();
   });
 });
