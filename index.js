@@ -33,6 +33,8 @@ const client = new Client({
   ],
 });
 
+const lastMessages = new Map();
+
 // Log in with the bot token
 client.login(process.env.DISCORD_TOKEN);
 
@@ -400,54 +402,68 @@ client.on("messageCreate", async (message) => {
     message.content.toLowerCase().startsWith("gilbert") ||
     message.reference?.messageId
   ) {
-    // If the message is a reply to Gilbert
+    let pastMessages = [];
+
+    // If replying to Gilbert, fetch the last message from Gilbert
     if (message.reference?.messageId) {
       try {
-        // Fetch the original message that was replied to (if it's from Gilbert)
         const referencedMessage = await message.fetchReference();
         if (referencedMessage.author.id === client.user.id) {
-          // Generate AI response with the context of the reply
-          const response = await openai.chat.completions.create({
-            model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert:BCxuH5NY",
-            messages: [
-              {
-                role: "system",
-                content:
-                  "You are a lizard wearing a red shirt called Gilbert, you are a Christian, wholesome, and informal Discord bot. You love making people smile, you speak with emojis sometimes and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and you're always chill and supportive.",
-              },
-              { role: "user", content: message.content }, // User's reply
-            ],
-            max_tokens: 250,
-          });
-
-          // Send Gilbert's reply to the thread or the message
-          message.reply(response.choices[0].message.content);
+          pastMessages.push({
+            role: "assistant",
+            content: referencedMessage.content,
+          }); // Store Gilbert's last message
         }
       } catch (error) {
-        console.error("Error generating AI response:", error);
-        message.reply("Oops! My brain feels funny. Try again later, please 😊");
+        console.error("Error fetching referenced message:", error);
       }
-    } else if (message.content.toLowerCase().startsWith("gilbert")) {
-      // If the message starts with "Gilbert" but is not a reply
-      try {
-        const response = await openai.chat.completions.create({
-          model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert:BCxuH5NY",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are a lizard wearing a red shirt called Gilbert, you are a Christian, wholesome, and informal Discord bot. You love making people smile, you speak with emojis sometimes and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and you're always chill and supportive.",
-            },
-            { role: "user", content: message.content },
-          ],
-          max_tokens: 250,
-        });
+    }
 
-        message.reply(response.choices[0].message.content);
-      } catch (error) {
-        console.error("Error generating AI response:", error);
-        message.reply("Oops! My brain feels funny. Try again later, please 😊");
+    // Check if the user has a stored message
+    if (!pastMessages.has(message.author.id)) {
+      pastMessages = lastMessages.get(message.author.id);
+    }
+
+    pastMessages.push({ role: "user", content: message.content });
+
+    if (pastMessages.length > 15) {
+      pastMessages.shift();
+    }
+
+    try {
+      const messages = [
+        {
+          role: "system",
+          content:
+            "You're a gecko called Gilbert, you are a Christian, wholesome, and informal. You love making people smile, you speak with emojis sometimes and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and you're always chill and supportive.",
+        },
+        ...pastMessages,
+      ];
+
+      // If there's past messages, include it as context
+      if (pastMessages) {
+        messages.push({ role: "assistant", content: pastMessage });
       }
+
+      messages.push({ role: "user", content: message.content });
+
+      // Generate AI response
+      const response = await openai.chat.completions.create({
+        model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert:BCxuH5NY",
+        messages: messages,
+        max_tokens: 165,
+      });
+
+      const gilbertReply = response.choices[0].message.content;
+      message.reply(gilbertReply);
+
+      // Store Gilbert's response for future context
+      lastMessages.set(message.author.id, gilbertReply);
+    } catch (error) {
+      console.error("Error generating AI response:", error);
+      message.reply(
+        "dang man my brain feels wierd. Try again later, please 😊"
+      );
     }
   }
 });
