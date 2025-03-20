@@ -41,9 +41,6 @@ const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
 import fs from "fs";
 import path from "path";
 
-const JokeApi =
-  "https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,religious,racist,sexist&type=single";
-
 //storing count in json
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const countFilePath = path.join(__dirname, "choclateCount.json");
@@ -327,7 +324,7 @@ client.on("messageCreate", async (message) => {
   }
   //.toLowerCase().includes(mj)
   // Check for mentions of Michael Jackson
-  if (mj.some((mj) => message.content.toLowerCase().has(mj))) {
+  if (mj.some((mj) => message.content.toLowerCase().includes(mj))) {
     message.react("🕺");
     await message.channel.send({
       content: `now thats a cool artitst ${member.displayName} be sure not to spam his name too much tho\n -# luca`,
