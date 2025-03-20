@@ -19,11 +19,10 @@ Gilbert is a smart, AI-powered assistant designed to enhance your Discord experi
 
 | Command       | Description                                      | Usage Example         |  
 |---------------|--------------------------------------------------|-----------------------|  
-| `message that starts with gilbert`         | Chat with Gilbert using AI.                      | `gilbert how are you` |  
-| `/stats`      | Get server stats like member count and activity. | `/stats`              |  
+| `message that starts with gilbert`         | Chat with Gilbert using AI.                      | `gilbert how are you` |   
 | `/userinfo`   | Get details about a user.                        | `/userinfo @user`     |  
 | `/serverinfo` | Get details about the server.                     | `/server_info`               |
-| `/help`       | Show all available commands.                     | `/help`               | 
+| `/help`       | Show all available commands.                     | `/help`               |
 
 ## 🤖 Future plans
 - refactor to use typescript
@@ -33,6 +32,7 @@ Gilbert is a smart, AI-powered assistant designed to enhance your Discord experi
 - create documentation
 - expand gilberts memory
 - add more interactions and commands
+- increase gilberts intelligence for conversations
 - make some features toggable like turning off welcome message etc
 - refactor code 😅
 
