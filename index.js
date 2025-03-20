@@ -398,75 +398,59 @@ client.on("messageCreate", async (message) => {
     });
   }
 
-  if (
-    message.content.toLowerCase().startsWith("gilbert") ||
-    message.reference?.messageId
-  ) {
-    let pastMessages = lastMessages.get(message.author.id) || [];
-
-    // If replying to Gilbert, fetch the last message from Gilbert
-    if (message.reference?.messageId) {
-      try {
-        const referencedMessage = await message.fetchReference();
-        if (referencedMessage.author.id === client.user.id) {
-          pastMessages.push({
-            role: "assistant",
-            content: referencedMessage.content,
-          }); // Store Gilbert's last message
-        }
-      } catch (error) {
-        console.error("Error fetching referenced message:", error);
-      }
-    }
-
-    // Check if the user has a stored message
-    if (!pastMessages.get(message.author.id)) {
-      pastMessages = [];
-    } else {
-      pastMessages = lastMessages.get(message.author.id);
-    }
-
-    pastMessages.push({ role: "user", content: message.content });
-
-    if (pastMessages.length > 15) {
-      pastMessages.shift();
-    }
-
+  if (message.reference?.messageId) {
     try {
-      const messages = [
-        {
-          role: "system",
-          content:
-            "You're a gecko called Gilbert, you are a Christian, wholesome, and informal. You love making people smile, you speak with emojis sometimes and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and you're always chill and supportive.",
-        },
-        ...pastMessages,
-      ];
-
-      // If there's past messages, include it as context
-      if (pastMessages) {
-        messages.push({ role: "assistant", content: pastMessages });
+      const referencedMessage = await message.fetchReference();
+      if (referencedMessage.author.id === client.user.id) {
+        pastMessages.push({
+          role: "assistant",
+          content: referencedMessage.content,
+        }); // Store Gilbert's last message
       }
-
-      messages.push({ role: "user", content: message.content });
-
-      // Generate AI response
-      const response = await openai.chat.completions.create({
-        model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert:BCxuH5NY",
-        messages: messages,
-        max_tokens: 165,
-      });
-
-      const gilbertReply = response.choices[0].message.content;
-      message.reply(gilbertReply);
-
-      // Store Gilbert's response for future context
-      lastMessages.set(message.author.id, gilbertReply);
     } catch (error) {
-      console.error("Error generating AI response:", error);
-      message.reply(
-        "dang man my brain feels wierd. Try again later, please 😊"
-      );
+      console.error("Error fetching referenced message:", error);
     }
+  }
+
+  // Check if the user has a stored message
+  // Use .some() to check if the pastMessages array contains a message from this user
+  if (!pastMessages.some((msg) => msg.role === "user" && msg.content)) {
+    pastMessages = [];
+  }
+
+  // Add the current message to the conversation history
+  pastMessages.push({ role: "user", content: message.content });
+
+  // Keep only the last 15 messages
+  if (pastMessages.length > 15) {
+    pastMessages.shift();
+  }
+
+  try {
+    const messages = [
+      {
+        role: "system",
+        content:
+          "You're a gecko called Gilbert, you are a Christian, wholesome, and informal. You love making people smile, you speak with emojis sometimes and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and you're always chill and supportive.",
+      },
+      ...pastMessages, // Add the pastMessages array to the context
+    ];
+
+    // Generate AI response
+    const response = await openai.chat.completions.create({
+      model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert:BCxuH5NY",
+      messages: messages,
+      max_tokens: 165,
+    });
+
+    const gilbertReply = response.choices[0].message.content;
+    message.reply(gilbertReply);
+
+    // Store the updated conversation history in lastMessages
+    lastMessages.set(message.author.id, pastMessages);
+  } catch (error) {
+    console.error("Error generating AI response:", error);
+    message.reply("dang man my brain feels weird. Try again later, please 😊");
   }
 });
 // interactions down here so commands buttons etc
@@ -487,10 +471,8 @@ client.on("interactionCreate", async (interaction) => {
       ephemeral: true,
     });
   }
-});
 
-//handling slash commands
-client.on("interactionCreate", async (interaction) => {
+  //handling slash commands
   if (interaction.isCommand()) {
     if (interaction.commandName === "help") {
       await interaction.reply({
