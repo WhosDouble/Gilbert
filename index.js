@@ -28,7 +28,7 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.MessageContent, // Required to listen to message content
+    GatewayIntentBits.MessageContent,
     GatewayIntentBits.DirectMessages,
   ],
 });
@@ -117,12 +117,12 @@ const thanks = [
 ];
 
 const brainRot = [
-  "GYAT",
+  "Gyat",
   "Skill Issue",
   "Cope",
-  "Rizz",
+  "rizz",
   "Slay",
-  "Pookie",
+  "pookie",
   "skibidi",
   "sigma",
   "alpha",
@@ -131,7 +131,7 @@ const brainRot = [
   "ohio",
   "duke dennis",
   "duke",
-  "baby gronk",
+  "sus",
   "gronk",
   "sussy",
   "baka",
@@ -139,6 +139,7 @@ const brainRot = [
   "sussy imposter",
   "goon",
   "gooner",
+  "gooning",
   "turbulence",
   "griddy",
   "gyatt",
@@ -173,16 +174,16 @@ const commands = [
     description: "sends a random Christian friendly pickup line",
   },
   {
-    name: "random_joke",
-    description: "sends a random joke",
-  },
-  {
     name: "rules",
     description: "Flowing Faith server rules",
   },
   {
-    name: "get_channel_messages",
-    description: "gets that channels messages and converts it into json",
+    name: "server_stats",
+    description: "get the server stats",
+  },
+  {
+    name: "user_stats",
+    description: "get stats on yourself",
   },
 ];
 
@@ -502,6 +503,20 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.commandName === "rules") {
       await interaction.reply({
         content: rules,
+        ephemeral: true,
+      });
+    }
+
+    if (interaction.commandName === "server_stats") {
+      await interaction.reply({
+        content: `${guild.memberCount}\n- ${guild.createdAt}\n- ${guild.description}`,
+        ephemeral: true,
+      });
+    }
+
+    if (interaction.commandName === "user_stats") {
+      await interaction.reply({
+        content: `${user.tag}\n- ${user.createdAt}\n- ${user.joinedAt}\n- ${member.presence?.activities}`,
         ephemeral: true,
       });
     }
