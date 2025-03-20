@@ -415,7 +415,11 @@ client.on("messageCreate", async (message) => {
   // Check if the user has a stored message
   // Use .some() to check if the pastMessages array contains a message from this user
   if (!pastMessages.some((msg) => msg.role === "user" && msg.content)) {
-    pastMessages = [];
+    console.log(
+      "No previous message from the user found, pastMessages won't be reset."
+    );
+    // Only clear pastMessages in specific cases, such as when pastMessages is empty or needs resetting
+    // pastMessages = [];  // Remove this line unless necessary
   }
 
   // Add the current message to the conversation history
@@ -447,7 +451,7 @@ client.on("messageCreate", async (message) => {
     message.reply(gilbertReply);
 
     // Store the updated conversation history in lastMessages
-    lastMessages.set(message.author.id, pastMessages);
+    pastMessages.set(message.author.id, pastMessages);
   } catch (error) {
     console.error("Error generating AI response:", error);
     message.reply("dang man my brain feels weird. Try again later, please 😊");
