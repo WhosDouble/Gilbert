@@ -400,7 +400,8 @@ client.on("messageCreate", async (message) => {
 
   if (
     message.content.toLowerCase().startsWith("gilbert") ||
-    message.reference?.messageId
+    (message.reference?.messageId &&
+      (await message.fetchReference()).author.id === client.user.id)
   ) {
     // Initialize pastMessages to store conversation history for the user
     let pastMessages = userMessages[message.author.id] || [];
