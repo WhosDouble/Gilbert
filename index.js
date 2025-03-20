@@ -33,7 +33,7 @@ const client = new Client({
   ],
 });
 
-const pastMessages = new Map();
+const userMessages = {};
 
 // Log in with the bot token
 client.login(process.env.DISCORD_TOKEN);
@@ -293,8 +293,6 @@ function sendVotd() {
 
 // the bot picking up on messages sent and responding accordingly
 client.on("messageCreate", async (message) => {
-  // Initialize pastMessages to store conversation history for the user
-  let pastMessages = pastMessages.get(message.author.id) || [];
   const member = await message.guild.members.fetch(message.author.id);
   console.log(message.content);
   console.log("message received");
@@ -404,6 +402,8 @@ client.on("messageCreate", async (message) => {
     message.content.toLowerCase().startsWith("gilbert") ||
     message.reference?.messageId
   ) {
+    // Initialize pastMessages to store conversation history for the user
+    let pastMessages = userMessages[message.author.id] || [];
     // If replying to a previous message, fetch the referenced message
     if (message.reference?.messageId) {
       try {
@@ -448,7 +448,7 @@ client.on("messageCreate", async (message) => {
       message.reply(gilbertReply);
 
       // Store the updated conversation history in lastMessages
-      pastMessages.set(message.author.id, pastMessages);
+      userMessages[message.author.id] = pastMessages;
     } catch (error) {
       console.error("Error generating AI response:", error);
       message.reply(
