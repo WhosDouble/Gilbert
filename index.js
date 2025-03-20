@@ -421,6 +421,8 @@ client.on("messageCreate", async (message) => {
 
     // Check if the user has a stored message
     if (!pastMessages.has(message.author.id)) {
+      pastMessages = [];
+    } else {
       pastMessages = lastMessages.get(message.author.id);
     }
 
