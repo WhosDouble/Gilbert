@@ -25,7 +25,7 @@ This is my very first discord bot so his purpose is a little all over the place 
 | ---------------------------------- | ----------------------------- | --------------------- |
 | `message that starts with gilbert` | Chat with Gilbert using AI.   | `gilbert how are you` |
 | `/userinfo`                        | Get details about a user.     | `/userinfo @user`     |
-| `/serverinfo`                      | Get details about the server. | `/server_info`        |
+| `/serverinfo`                      | Get details about the server. | `/serverinfo`         |
 | `/help`                            | Show all available commands.  | `/help`               |
 
 ## 🤖 Future plans
