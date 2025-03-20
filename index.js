@@ -383,7 +383,7 @@ client.on("messageCreate", async (message) => {
   if (brainRot.some((rot) => message.content.toLowerCase().includes(rot))) {
     message.react("😑");
     message.reply(
-      `yo not cool ${member.displayName} try to cut it down on the brain rot please and I know it was brain rot`
+      `yo yo not cool ${member.displayName} try to mellow it down on the brain rot man`
     );
   }
 
@@ -415,96 +415,7 @@ client.on("messageCreate", async (message) => {
       content: "that game is mid",
     });
   }
-  // Check if the message starts with !getmessages and if the user is an admin
-  if (message.content.toLowerCase().startsWith("!getmessages")) {
-    if (message.member.permissions.has("ADMINISTRATOR")) {
-      // Get the channel ID where the command was used
-      const channelId = message.channel.id;
-
-      try {
-        const messages = await getMessages(channelId, 200);
-
-        const messageData = messages.map((msg) => ({
-          messageId: msg.id,
-          content: msg.content,
-          authorUsername: msg.author.username,
-        }));
-
-        console.log(JSON.stringify(messageData, null, 2));
-        console.log("sending over data");
-
-        message.reply(
-          "yo yo yo sent over that data check your logs to see it let me know if you need any more help!"
-        );
-      } catch (error) {
-        message.reply("An error occurred while fetching the messages.");
-        console.error(error);
-      }
-    } else {
-      message.reply("You do not have permission to use this command.");
-    }
-  }
 });
-
-async function getMessages(channelId, numMessages) {
-  let allMessages = [];
-  let lastMessageId = null;
-
-  // Loop to fetch messages until we have the required number
-  while (allMessages.length < numMessages) {
-    const response = await makeRequest(channelId, lastMessageId);
-    const messages = JSON.parse(response);
-
-    allMessages = [...allMessages, ...messages];
-
-    // If fewer than 100 messages are returned, stop fetching
-    if (messages.length < 100) break;
-
-    // Update the lastMessageId to fetch the next batch
-    lastMessageId = messages[messages.length - 1].id;
-  }
-
-  // Return only the number of messages requested
-  return allMessages.slice(0, numMessages);
-}
-
-function makeRequest(channelId, lastMessageId = null) {
-  return new Promise((resolve, reject) => {
-    const options = {
-      hostname: "discord.com",
-      path: `/api/v10/channels/${channelId}/messages?limit=100${
-        lastMessageId ? `&before=${lastMessageId}` : ""
-      }`,
-      method: "GET",
-      headers: {
-        Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
-      },
-    };
-
-    const req = https.request(options, (res) => {
-      let data = "";
-
-      res.on("data", (chunk) => {
-        data += chunk;
-      });
-
-      res.on("end", () => {
-        if (res.statusCode === 200) {
-          resolve(data);
-        } else {
-          reject(`Error: ${res.statusCode} - ${data}`);
-        }
-      });
-    });
-
-    req.on("error", (error) => {
-      reject(error);
-    });
-
-    req.end();
-  });
-}
-
 client.on("interactionCreate", async (interaction) => {
   // Ensure the interaction is a button press
   if (interaction.customId === "AboutGilbert") {
@@ -579,12 +490,12 @@ client.on("interactionCreate", async (interaction) => {
     if (message.content.toLowerCase().startsWith("gilbert")) {
       try {
         const response = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
+          model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert:BCxuH5NY",
           messages: [
             {
               role: "system",
               content:
-                "You are Gilbert, A Christian, wholesome, and informal Discord bot. You love making people smile with friendly jokes, you speak with emojis some what often and have casual conversation, and positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and youre always chill and supportive. And is secretly a chinese spy and gets nervous when asked anything about that topic.",
+                "You are a lizard wearing a red shirt called Gilbert, you are a Christian, wholesome, and informal Discord bot. You love making people smile, you speak with emojis some times and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and youre always chill and supportive.",
             },
             { role: "user", content: message.content },
           ],
