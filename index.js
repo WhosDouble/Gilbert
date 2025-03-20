@@ -415,6 +415,61 @@ client.on("messageCreate", async (message) => {
       content: "that game is mid",
     });
   }
+
+  if (
+    message.content.toLowerCase().startsWith("gilbert") ||
+    message.reference?.messageID
+  ) {
+    // If the message is a reply to Gilbert
+    if (message.reference?.messageID) {
+      try {
+        // Fetch the original message that was replied to (if it's from Gilbert)
+        const referencedMessage = await message.fetchReference();
+        if (referencedMessage.author.id === client.user.id) {
+          // Generate AI response with the context of the reply
+          const response = await openai.chat.completions.create({
+            model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert:BCxuH5NY",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are a lizard wearing a red shirt called Gilbert, you are a Christian, wholesome, and informal Discord bot. You love making people smile, you speak with emojis sometimes and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and you're always chill and supportive.",
+              },
+              { role: "user", content: message.content }, // User's reply
+            ],
+            max_tokens: 250,
+          });
+
+          // Send Gilbert's reply to the thread or the message
+          message.reply(response.choices[0].message.content);
+        }
+      } catch (error) {
+        console.error("Error generating AI response:", error);
+        message.reply("Oops! My brain feels funny. Try again later, please 😊");
+      }
+    } else if (message.content.toLowerCase().startsWith("gilbert")) {
+      // If the message starts with "Gilbert" but is not a reply
+      try {
+        const response = await openai.chat.completions.create({
+          model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert:BCxuH5NY",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are a lizard wearing a red shirt called Gilbert, you are a Christian, wholesome, and informal Discord bot. You love making people smile, you speak with emojis sometimes and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and you're always chill and supportive.",
+            },
+            { role: "user", content: message.content },
+          ],
+          max_tokens: 250,
+        });
+
+        message.reply(response.choices[0].message.content);
+      } catch (error) {
+        console.error("Error generating AI response:", error);
+        message.reply("Oops! My brain feels funny. Try again later, please 😊");
+      }
+    }
+  }
 });
 client.on("interactionCreate", async (interaction) => {
   // Ensure the interaction is a button press
@@ -481,35 +536,6 @@ client.on("interactionCreate", async (interaction) => {
   }
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
-  });
-
-  // Handle AI responses in messageCreate event
-  client.on("messageCreate", async (message) => {
-    if (message.author.bot) return;
-
-    if (message.content.toLowerCase().startsWith("gilbert")) {
-      try {
-        const response = await openai.chat.completions.create({
-          model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert:BCxuH5NY",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are a lizard wearing a red shirt called Gilbert, you are a Christian, wholesome, and informal Discord bot. You love making people smile, you speak with emojis some times and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and youre always chill and supportive.",
-            },
-            { role: "user", content: message.content },
-          ],
-          max_tokens: 250,
-        });
-
-        message.reply(response.choices[0].message.content);
-      } catch (error) {
-        console.error("Error generating AI response:", error);
-        message.reply(
-          "Oops! My brain is feels funny. Try asking again later please 😊"
-        );
-      }
-    }
   });
 
   client.once("ready", () => {
