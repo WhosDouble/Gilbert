@@ -33,7 +33,7 @@ const client = new Client({
   ],
 });
 
-const lastMessages = new Map();
+const pastMessages = new Map();
 
 // Log in with the bot token
 client.login(process.env.DISCORD_TOKEN);
