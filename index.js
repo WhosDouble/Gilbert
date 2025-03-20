@@ -28,10 +28,12 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.MessageContent, // Required to listen to message content
+    GatewayIntentBits.MessageContent,
     GatewayIntentBits.DirectMessages,
   ],
 });
+
+const userMessages = {};
 
 // Log in with the bot token
 client.login(process.env.DISCORD_TOKEN);
@@ -115,12 +117,12 @@ const thanks = [
 ];
 
 const brainRot = [
-  "GYAT",
+  "Gyat",
   "Skill Issue",
   "Cope",
-  "Rizz",
+  "rizz",
   "Slay",
-  "Pookie",
+  "pookie",
   "skibidi",
   "sigma",
   "alpha",
@@ -129,7 +131,7 @@ const brainRot = [
   "ohio",
   "duke dennis",
   "duke",
-  "baby gronk",
+  "sus",
   "gronk",
   "sussy",
   "baka",
@@ -137,6 +139,7 @@ const brainRot = [
   "sussy imposter",
   "goon",
   "gooner",
+  "gooning",
   "turbulence",
   "griddy",
   "gyatt",
@@ -167,20 +170,16 @@ const commands = [
     description: "List all available commands",
   },
   {
-    name: "random_pickup_line",
-    description: "sends a random Christian friendly pickup line",
-  },
-  {
-    name: "random_joke",
-    description: "sends a random joke",
-  },
-  {
     name: "rules",
     description: "Flowing Faith server rules",
   },
   {
-    name: "get_channel_messages",
-    description: "gets that channels messages and converts it into json",
+    name: "server_stats",
+    description: "get the server stats",
+  },
+  {
+    name: "user_stats",
+    description: "get stats on yourself",
   },
 ];
 
@@ -202,12 +201,12 @@ async function registerCommands() {
     console.error(error);
   }
 }
+const welcomeId = "1227288321152122972";
+const welcomeChannel = client.channels.cache.get(welcomeId);
 
 client.on("guildMemberAdd", async (member) => {
+  const member = await message.guild.members.fetch(message.author.id);
   try {
-    const welcomeChannel = "1227288321152122972";
-    const member = await message.guild.members.fetch(message.author.id);
-
     if (welcomeChannel) {
       welcomeChannel.send(
         `Heyo ${member.displayName}! heres a Big welcome to the Flowing Faith server!`
@@ -327,7 +326,7 @@ client.on("messageCreate", async (message) => {
   if (mj.some((mj) => message.content.toLowerCase().includes(mj))) {
     message.react("🕺");
     await message.channel.send({
-      content: `now thats a cool artitst ${member.displayName} be sure not to spam his name too much tho\n -# luca`,
+      content: `now thats a cool artitst ${member.displayName} be sure not to spam his name too much tho\n-# luca`,
     });
   }
 
@@ -398,56 +397,61 @@ client.on("messageCreate", async (message) => {
 
   if (
     message.content.toLowerCase().startsWith("gilbert") ||
-    message.reference?.messageId
+    (message.reference?.messageId &&
+      (await message.fetchReference()).author.id === client.user.id)
   ) {
-    // If the message is a reply to Gilbert
+    // Initialize pastMessages to store conversation history for the user
+    let pastMessages = userMessages[message.author.id] || [];
+    // If replying to a previous message, fetch the referenced message
     if (message.reference?.messageId) {
       try {
-        // Fetch the original message that was replied to (if it's from Gilbert)
         const referencedMessage = await message.fetchReference();
         if (referencedMessage.author.id === client.user.id) {
-          // Generate AI response with the context of the reply
-          const response = await openai.chat.completions.create({
-            model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert:BCxuH5NY",
-            messages: [
-              {
-                role: "system",
-                content:
-                  "You are a lizard wearing a red shirt called Gilbert, you are a Christian, wholesome, and informal Discord bot. You love making people smile, you speak with emojis sometimes and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and you're always chill and supportive.",
-              },
-              { role: "user", content: message.content }, // User's reply
-            ],
-            max_tokens: 250,
-          });
-
-          // Send Gilbert's reply to the thread or the message
-          message.reply(response.choices[0].message.content);
+          pastMessages.push({
+            role: "assistant",
+            content: referencedMessage.content,
+          }); // Store Gilbert's last message
         }
       } catch (error) {
-        console.error("Error generating AI response:", error);
-        message.reply("Oops! My brain feels funny. Try again later, please 😊");
+        console.error("Error fetching referenced message:", error);
       }
-    } else if (message.content.toLowerCase().startsWith("gilbert")) {
-      // If the message starts with "Gilbert" but is not a reply
-      try {
-        const response = await openai.chat.completions.create({
-          model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert:BCxuH5NY",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are a lizard wearing a red shirt called Gilbert, you are a Christian, wholesome, and informal Discord bot. You love making people smile, you speak with emojis sometimes and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and you're always chill and supportive.",
-            },
-            { role: "user", content: message.content },
-          ],
-          max_tokens: 250,
-        });
+    }
 
-        message.reply(response.choices[0].message.content);
-      } catch (error) {
-        console.error("Error generating AI response:", error);
-        message.reply("Oops! My brain feels funny. Try again later, please 😊");
-      }
+    // Add the current message to the conversation history
+    pastMessages.push({ role: "user", content: message.content });
+
+    // Keep only the last 15 messages
+    if (pastMessages.length > 15) {
+      pastMessages.shift();
+    }
+
+    try {
+      const messages = [
+        {
+          role: "system",
+          content:
+            "You're a gecko called Gilbert, you are a Christian, wholesome, and informal. You love making people smile, you speak with emojis sometimes and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and you're always chill and supportive.",
+        },
+        ...pastMessages, // Add the pastMessages array to the context
+      ];
+
+      // Generate AI response
+      const response = await openai.chat.completions.create({
+        model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert-v2:BD5TX2cN",
+        messages: messages,
+        max_tokens: 165,
+      });
+
+      const gilbertReply = response.choices[0].message.content;
+      message.reply(gilbertReply);
+
+      // Store the updated conversation history in lastMessages
+      userMessages[message.author.id] = pastMessages;
+    } catch (error) {
+      console.error("Error generating AI response:", error);
+      message.reply(
+        "dang man my brain feels weird. Try again later, please 😊"
+      );
     }
   }
 });
@@ -465,19 +469,17 @@ client.on("interactionCreate", async (interaction) => {
   if (interaction.customId === "AnythingNew") {
     await interaction.reply({
       content:
-        "now i have a new command Rango has adujusted my personality and plans on training my brain soon. try asking me something make sure the sentence starts with my name! Rango will soon make it where you can select what type of joke I will tell. Rango has alot of plans to add more wacky interactions! Try `/help` to see what I can do now.",
+        "i now have the ability to remember things yayyy there is a limit on my memory for now but still cool right rango has now done one generation of training me so my personality is a little more well me lol try asking me something make sure the sentence starts with my name! Rango will soon make it where you can select what type of joke I will tell. Rango has alot of plans to add more wacky interactions! Try `/help` to see what I can do now.",
       ephemeral: true,
     });
   }
-});
 
-//handling slash commands
-client.on("interactionCreate", async (interaction) => {
+  //handling slash commands
   if (interaction.isCommand()) {
     if (interaction.commandName === "help") {
       await interaction.reply({
         content:
-          "Here are the available commands\n- `/help` - Lists all available commands\n- `/random_pickup_line` - Sends a random Christian friendly pickup line\n- `/rules` - The Flowing Faith rule",
+          "Here are the available commands\n- `/help` - Lists all available commands\n- `/rules` - The Flowing Faith rule\n- `/user_stats` - sends user stats\n- `/server_stats` - sends server stats",
         ephemeral: true,
       });
     }
@@ -497,6 +499,20 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.commandName === "rules") {
       await interaction.reply({
         content: rules,
+        ephemeral: true,
+      });
+    }
+
+    if (interaction.commandName === "server_stats") {
+      await interaction.reply({
+        content: `${guild.memberCount}\n- ${guild.createdAt}\n- ${guild.description}`,
+        ephemeral: true,
+      });
+    }
+
+    if (interaction.commandName === "user_stats") {
+      await interaction.reply({
+        content: `${user.tag}\n- ${user.createdAt}\n- ${user.joinedAt}\n- ${member.presence?.activities}`,
         ephemeral: true,
       });
     }
