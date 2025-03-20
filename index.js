@@ -293,6 +293,8 @@ function sendVotd() {
 
 // the bot picking up on messages sent and responding accordingly
 client.on("messageCreate", async (message) => {
+  // Initialize pastMessages to store conversation history for the user
+  let pastMessages = pastMessages.get(message.author.id) || [];
   const member = await message.guild.members.fetch(message.author.id);
   console.log(message.content);
   console.log("message received");
@@ -402,9 +404,6 @@ client.on("messageCreate", async (message) => {
     message.content.toLowerCase().startsWith("gilbert") ||
     message.reference?.messageId
   ) {
-    // Initialize pastMessages to store conversation history for the user
-    let pastMessages = pastMessages.get(message.author.id) || [];
-
     // If replying to a previous message, fetch the referenced message
     if (message.reference?.messageId) {
       try {
