@@ -440,7 +440,7 @@ client.on("messageCreate", async (message) => {
 
       // Generate AI response
       const response = await openai.chat.completions.create({
-        model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert:BCxuH5NY",
+        model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert-v2:BD5TX2cN",
         messages: messages,
         max_tokens: 165,
       });
