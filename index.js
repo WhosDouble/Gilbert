@@ -13,7 +13,9 @@ import {
 
 import OpenAI from "openai";
 
-import https from "https";
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 import db from "./db.js";
 
@@ -534,9 +536,6 @@ client.on("interactionCreate", async (interaction) => {
       }
     }
   }
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
 
   client.once("ready", () => {
     console.log(`Logged in as ${client.user.tag}`);
