@@ -1,4 +1,4 @@
-export const bibleVersus = [
+const bibleVersus = [
   "1 Corinthians 13:4-5",
   "1 Thessalonians 5:16-18",
   "Philippians 4:6-7",
@@ -99,3 +99,4 @@ export const bibleVersus = [
   "Proverbs 17:17",
   "1 Corinthians 15:57",
 ];
+export default bibleVersus;
