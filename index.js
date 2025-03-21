@@ -183,22 +183,20 @@ const commands = [
 
 async function registerCommands() {
   try {
-    console.log("Initiated Koolaid protocol...");
-
+    console.log("Clearing existing commands...");
     await rest.put(
       Routes.applicationGuildCommands(
         process.env.CLIENT_ID,
         process.env.GUILD_ID
       ),
-      {
-        body: commands,
-      }
+      { body: [] }
     );
-    console.log("Successfully registered application commands.");
+    console.log("Existing commands cleared.");
   } catch (error) {
-    console.error(error);
+    console.error("Error clearing commands:", error);
   }
 }
+
 const welcomeId = "1227288321152122972";
 const welcomeChannel = client.channels.cache.get(welcomeId);
 
