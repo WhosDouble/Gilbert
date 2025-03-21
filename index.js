@@ -19,6 +19,7 @@ const openai = new OpenAI({
 
 import db from "./db.js";
 import rules from "./files/rules.js";
+import bibleVersus from "./files/verses.js";
 
 const client = new Client({
   intents: [
@@ -216,11 +217,6 @@ client.on("guildMemberAdd", async (member) => {
 const bumpChannelId = "1228039676279918713";
 const bumpId = "1351749413122474015";
 
-client.once("ready", () => {
-  console.log("Bot is ready!");
-  scheduleBumpReminder();
-});
-
 function scheduleBumpReminder() {
   const now = new Date();
   const nextWholeHour = new Date();
@@ -289,105 +285,7 @@ client.on("messageCreate", async (message) => {
   let member = await message.guild.members.fetch(message.author.id);
   // Ignore messages from bots
   if (message.author.bot) return;
-
-  // Handle chocolate mention
-  if (message.content.toLowerCase().includes("chocolate")) {
-    try {
-      // Increment the chocolate count in the database
-      await db.query(
-        "UPDATE chocolate_count SET count = count + 1 WHERE id = 1"
-      );
-
-      // Get the updated chocolate count
-      const res = await db.query(
-        "SELECT count FROM chocolate_count WHERE id = 1"
-      );
-      const chocolateCount = res.rows[0].count;
-
-      // Send a message with the updated count
-      message.react("🍫");
-      message.reply(
-        `wow chocolate has been said ${chocolateCount} times. Way to go Luca ${randomEmoji}`
-      );
-    } catch (error) {
-      console.error("Error updating chocolate count:", error);
-      message.reply("Oops, something went wrong with the chocolate count!");
-    }
-  }
-  //.toLowerCase().includes(mj)
-  // Check for mentions of Michael Jackson
-  if (mj.some((mj) => message.content.toLowerCase().includes(mj))) {
-    message.react("🕺");
-    await message.channel.send({
-      content: `now thats a cool artist ${member.displayName}`,
-    });
-  }
-
-  // Handle greetings
-  if (
-    greeting.some(
-      (greet) =>
-        message.content.toLowerCase().startsWith(greet) &&
-        message.content.toLowerCase().endsWith("gilbert")
-    )
-  ) {
-    await message.channel.send({
-      content: `${randomGreet} ${member.displayName} that's meee! How can I help you today?`,
-      components: [row],
-      ephemeral: false,
-    });
-  }
-
-  // Handle "thanks" messages
-  if (
-    thanks.some(
-      (thank) =>
-        message.content.toLowerCase().includes(thank) &&
-        message.content.toLowerCase().endsWith("gilbert")
-    )
-  ) {
-    await message.channel.send({
-      content: `${randomDenada} 😉 Thank you ${member.displayName} For thanking me 😎`,
-    });
-  }
-
-  //brain rot detection
-  if (brainRot.some((rot) => message.content.toLowerCase().includes(rot))) {
-    message.react("😑");
-    message.reply(
-      `yo yo not cool ${member.displayName} try to mellow it down on the brain rot man`
-    );
-  }
-
-  if (message.content.toLowerCase().includes(lol)) {
-    message.reply("lol");
-    message.react(randomEmoji);
-  }
-
-  // Handle "sad" messages
-  if (message.content.toLowerCase().includes("sad")) {
-    await message.channel.send({
-      content: "Oh no I hope no one is sad 😞",
-    });
-  }
-
-  // Handle "sorry" messages
-  if (
-    message.content.toLowerCase().includes("sorry") &&
-    message.content.toLowerCase().endsWith("gilbert")
-  ) {
-    await message.channel.send({
-      content: "It's ok humans make mistakes, but Gilbert doesn't 😐",
-    });
-  }
-  //checks if a message contains the key word "fortnite"
-  if (message.content.toLowerCase().includes("fortnite")) {
-    message.reply("💩");
-    await message.channel.send({
-      content: "that game is mid",
-    });
-  }
-
+  //handleing ai interactions
   if (
     message.content.toLowerCase().startsWith("gilbert") ||
     (message.reference?.messageId &&
@@ -413,8 +311,8 @@ client.on("messageCreate", async (message) => {
     // Add the current message to the conversation history
     pastMessages.push({ role: "user", content: message.content });
 
-    // Keep only the last 15 messages
-    if (pastMessages.length > 15) {
+    // Keep only the last 10 messages
+    if (pastMessages.length > 10) {
       pastMessages.shift();
     }
 
@@ -447,6 +345,99 @@ client.on("messageCreate", async (message) => {
       );
     }
   }
+
+  // Handle chocolate mention
+  if (message.content.toLowerCase().includes("chocolate")) {
+    try {
+      // Increment the chocolate count in the database
+      await db.query(
+        "UPDATE chocolate_count SET count = count + 1 WHERE id = 1"
+      );
+
+      // Get the updated chocolate count
+      const res = await db.query(
+        "SELECT count FROM chocolate_count WHERE id = 1"
+      );
+      const chocolateCount = res.rows[0].count;
+
+      // Send a message with the updated count
+      message.react("🍫");
+      message.reply(
+        `wow chocolate has been said ${chocolateCount} times. Way to go Luca ${randomEmoji}`
+      );
+    } catch (error) {
+      console.error("Error updating chocolate count:", error);
+      message.reply("Oops, something went wrong with the chocolate count!");
+    }
+  }
+  // Check for mentions of Michael Jackson
+  if (mj.some((mj) => message.content.toLowerCase().includes(mj))) {
+    message.react("🕺");
+    await message.channel.send({
+      content: `now thats a cool artist ${member.displayName}`,
+    });
+  }
+  // Handle greetings
+  if (
+    greeting.some(
+      (greet) =>
+        message.content.toLowerCase().startsWith(greet) &&
+        message.content.toLowerCase().endsWith("gilbert")
+    )
+  ) {
+    await message.channel.send({
+      content: `${randomGreet} ${member.displayName} that's meee! How can I help you today?`,
+      components: [row],
+      ephemeral: false,
+    });
+  }
+  // Handle "thanks" messages
+  if (
+    thanks.some(
+      (thank) =>
+        message.content.toLowerCase().includes(thank) &&
+        message.content.toLowerCase().endsWith("gilbert")
+    )
+  ) {
+    await message.channel.send({
+      content: `${randomDenada} 😉 Thank you ${member.displayName} For thanking me 😎`,
+    });
+  }
+  //brain rot detection
+  if (brainRot.some((rot) => message.content.toLowerCase().includes(rot))) {
+    message.react("😑");
+    message.reply(
+      `yo yo not cool ${member.displayName} try to mellow it down on the brain rot man`
+    );
+  }
+
+  if (message.content.toLowerCase().includes(lol)) {
+    message.reply("lol");
+    message.react(randomEmoji);
+  }
+
+  // Handle "sad" messages
+  if (message.content.toLowerCase().includes("sad")) {
+    await message.channel.send({
+      content: "Oh no I hope no one is sad 😞",
+    });
+  }
+  // Handle "sorry" messages
+  if (
+    message.content.toLowerCase().includes("sorry") &&
+    message.content.toLowerCase().endsWith("gilbert")
+  ) {
+    await message.channel.send({
+      content: "It's ok humans make mistakes, but Gilbert doesn't 😐",
+    });
+  }
+  //checks if a message contains the key word "fortnite"
+  if (message.content.toLowerCase().includes("fortnite")) {
+    message.reply("💩");
+    await message.channel.send({
+      content: "that game is mid",
+    });
+  }
 });
 // interactions down here so commands buttons etc
 client.on("interactionCreate", async (interaction) => {
@@ -466,7 +457,6 @@ client.on("interactionCreate", async (interaction) => {
       ephemeral: true,
     });
   }
-
   //handling slash commands
   if (interaction.isCommand()) {
     if (interaction.commandName === "help") {
@@ -485,15 +475,18 @@ client.on("interactionCreate", async (interaction) => {
     }
 
     if (interaction.commandName === "serverinfo") {
+      const guild = interaction.guild;
+
       await interaction.reply({
-        content: `${guild.memberCount}\n- ${guild.createdAt}\n- ${guild.description}`,
+        content: `server has ${guild.memberCount}\n- server was created at${guild.createdAt}\n- about the server${guild.description}`,
         ephemeral: true,
       });
     }
 
     if (interaction.commandName === "userinfo") {
+      const user = interaction.user;
       await interaction.reply({
-        content: `${user.tag}\n- ${user.createdAt}\n- ${user.joinedAt}\n- ${member.presence?.activities}`,
+        content: `${user.userName} made account at ${user.createdAt} and joined the server at ${user.joinedAt}\n- ${member.presence?.activities}`,
         ephemeral: true,
       });
     }
@@ -501,7 +494,8 @@ client.on("interactionCreate", async (interaction) => {
 
   client.once("ready", () => {
     console.log(`Logged in as ${client.user.tag}`);
-    registerCommands(); // Register commands after bot is ready
+    registerCommands();
     scheduleDailyMessage();
+    scheduleBumpReminder();
   });
 });
