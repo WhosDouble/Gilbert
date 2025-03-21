@@ -18,7 +18,7 @@ const openai = new OpenAI({
 });
 
 import db from "./db.js";
-import { rules } from "./files/rules.js";
+import rules from "./files/rules.js";
 
 const client = new Client({
   intents: [
