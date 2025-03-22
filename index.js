@@ -440,6 +440,9 @@ client.on("interactionCreate", async (interaction) => {
 
   client.once("ready", () => {
     console.log(`Logged in as ${client.user.tag}`);
+    client.user.setPresence({
+      activities: [{ name: "try saying hi to me", type: "LISTENING" }],
+    });
     registerCommands();
     scheduleDailyMessage();
     scheduleBumpReminder();
