@@ -18,7 +18,6 @@ const openai = new OpenAI({
 });
 
 import db from "./db.js";
-import rules from "./files/rules.js";
 import bibleVersus from "./files/verses.js";
 
 const client = new Client({
@@ -159,27 +158,10 @@ const AnythingNewBtn = new ButtonBuilder()
   .setStyle(ButtonStyle.Secondary)
   .setCustomId("AnythingNew");
 
+//TODO add a how to use button that explains how to use gilbert
+
 // when defining multiple buttons you can create a row
 const row = new ActionRowBuilder().addComponents(tellBtn, AnythingNewBtn);
-
-const commands = [
-  {
-    name: "help",
-    description: "List all available commands",
-  },
-  {
-    name: "rules",
-    description: "Flowing Faith server rules",
-  },
-  {
-    name: "serverinfo",
-    description: "get the server stats",
-  },
-  {
-    name: "userinfo",
-    description: "get stats on yourself",
-  },
-];
 
 async function registerCommands() {
   try {
@@ -310,7 +292,7 @@ client.on("messageCreate", async (message) => {
     pastMessages.push({ role: "user", content: message.content });
 
     // Keep only the last 10 messages
-    if (pastMessages.length > 10) {
+    if (pastMessages.length > 100) {
       pastMessages.shift();
     }
 
@@ -319,7 +301,7 @@ client.on("messageCreate", async (message) => {
         {
           role: "system",
           content:
-            "You're a gecko called Gilbert, you are a Christian, wholesome, and informal. You love making people smile, you speak with emojis sometimes and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You avoid anything offensive or rude, and you're always chill and supportive.",
+            "You're a gecko called Gilbert and you have a brother called Hilbert, you are a Christian, wholesome, and informal. You love making people smile, you speak with emojis sometimes and have positive vibes. You speak in a laid-back, engaging way, like a good friend hanging out in a Discord server. You never say anything offensive or rude, and you're always chill and supportive.",
         },
         ...pastMessages, // Add the pastMessages array to the context
       ];
@@ -451,43 +433,9 @@ client.on("interactionCreate", async (interaction) => {
   if (interaction.customId === "AnythingNew") {
     await interaction.reply({
       content:
-        "i have new commands i have the ability to remember things yayyy there is a limit on my memory for now but still cool right rango has now done one generation of training me so my personality is a little more well me lol try asking me something make sure the sentence starts with my name! Rango has alot of plans to add more wacky interactions! Try `/help` to see what I can do now.",
+        "my memory has been increased by a HUGE AMOUNT (may not be permenant jsut test phase) but still cool right rango has now done two generations of training me so my personality is a little more well me lol try asking me something make sure the sentence starts with my name! Rango has alot of plans to add more wacky interactions!",
       ephemeral: true,
     });
-  }
-  //handling slash commands
-  if (interaction.isCommand()) {
-    if (interaction.commandName === "help") {
-      await interaction.reply({
-        content:
-          "Here are the available commands\n- `/help` - Lists all available commands\n- `/rules` - The Flowing Faith rule\n- `/userinfo` - sends user stats\n- `/serverinfo` - sends server stats",
-        ephemeral: true,
-      });
-    }
-
-    if (interaction.commandName === "rules") {
-      await interaction.reply({
-        content: rules,
-        ephemeral: true,
-      });
-    }
-
-    if (interaction.commandName === "serverinfo") {
-      const guild = interaction.guild;
-
-      await interaction.reply({
-        content: `server has ${guild.memberCount}\n- server was created at${guild.createdAt}\n- about the server${guild.description}`,
-        ephemeral: true,
-      });
-    }
-
-    if (interaction.commandName === "userinfo") {
-      const user = interaction.user;
-      await interaction.reply({
-        content: `${user.userName} made account at ${user.createdAt} and joined the server at ${user.joinedAt}\n- ${member.presence?.activities}`,
-        ephemeral: true,
-      });
-    }
   }
 
   client.once("ready", () => {
