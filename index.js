@@ -179,10 +179,10 @@ async function registerCommands() {
   }
 }
 
-const welcomeId = "1227288321152122972";
-const welcomeChannel = client.channels.cache.get(welcomeId);
-
 client.on("guildMemberAdd", async (member) => {
+  const welcomeId = "1227288321152122972";
+  const welcomeChannel = client.channels.cache.get(welcomeId);
+
   try {
     if (welcomeChannel) {
       welcomeChannel.send(
@@ -308,7 +308,7 @@ client.on("messageCreate", async (message) => {
 
       // Generate AI response
       const response = await openai.chat.completions.create({
-        model: "ft:gpt-4o-mini-2024-07-18:bystander:gilbert-v2:BD5TX2cN",
+        model: "ft:gpt-4o-mini-2024-07-18:bystander::BF7cC7KH",
         messages: messages,
         max_tokens: 165,
       });
