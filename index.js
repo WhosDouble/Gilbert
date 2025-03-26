@@ -181,7 +181,7 @@ async function registerCommands() {
 
 client.on("guildMemberAdd", async (member) => {
   const welcomeId = "1227288321152122972";
-  const welcomeChannel = client.channels.cache.get(welcomeId);
+  const welcomeChannel = member.guild.channels.cache.get(welcomeId);
 
   try {
     if (welcomeChannel) {
